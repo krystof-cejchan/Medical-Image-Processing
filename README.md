@@ -394,3 +394,468 @@ Average pooling měl problém se zachováním hran a textur; max pooling v tomto
 ![vysledek](./out/test_predictions_25-11-06_10-23-06/test_preds/test_00077.png)
 
 ![vysledek](./out/test_predictions_25-11-06_10-23-06/test_preds/test_00028.png)
+
+
+
+
+
+# Assingment 02
+
+Cílem tohoto úkolu bylo využít dataset z prvního úkolu a natrénovat na něm síť U-Net.
+
+![test_00006.png](CNN%20implementation/out/test_predictions_25-11-04_14-14-44/test_preds/test_00006.png)
+
+## Part 1: Dataset Preparation
+
+Dataset se skládal ze zkruba 300 obrázků z prvního úkolu,
+přičemž došlo ke změně, a to sice že se odstranila černá úsečka rozdělující prostřední tobuli cílie.
+Dataset byl rozdělen na originální obrázky cílií a jejich černobílé masky.
+
+Originální bitmapové obrázky byly načteny jako grey-scale a zvětšeny na rozlišení 256x256 pixelů pomocí bilineární interpolace.
+Stejně byly načteny i masky, které ovšem byly zvětšeny pomocí interpolace nejbližího souseda, což v tomto případě šlo pro vést relativně bezproblémově, neboť se jedná o černobílé obrázky.
+
+Pro zvětšení velikosti vstupního datasetu byla použita augmentace v podobě rotace obrázů o 90°, 180° a 270°. Díky takto zvoleným rotacím se nemuselo řešit, co se stane s prázným místem, kdybychom obrázek otočili o např. 45°. Také bylo zjištěno, že při zvýšení počtu rotací (např. kdybychom rotovali obrázek o 15°), tak by trénování sítě zabralo příliš mnoho času (za předpokladu, že bychom nenastavili počet epoch na nějaký nízký počet).
+
+## Part 2: U-Net Architecture
+
+U-Net je realizován v pětivrstvé architektuře (5 downsample bloků následovaných bottleneckem a 5 upsample bloky). Počet konvolučních filtrů na vstupní vrstvě je 16; v každém dalším stupni encoderu se počet filtrů zdvojnásobuje (tzn. 16, 32, 64, 128, 256). Zvhledem k tomu, že obrázek je na vstupu 256x256, tak se po poolováních v enkóderu dostane na 16x16.
+Decoder je symetrický k encoderu a v jednotlivých úrovních postupně snižuje počet kanálů zpět na 16, přičemž využívá skip connection spojující odpovídající vrstvy.
+
+Při implementaci výsledného řešení byly otestovány i některé úpravy, které ovšem nefungovaly dostatečně efektivně a proto nebyly použity. Mezi těmito úpravami bylo: 1） snížení počtu vrstev na 2, to způsobilo, že síť označovala některé části jako false positive.
+
+![test_00005fp.png](CNN%20implementation/out/test_predictions_25-11-04_07-12-49/test_preds/test_00005.png)
+
+2） Počet konvolučních filtrů na vstupní vrstvě byl nastaven na 32. Toto vedlo ke zvýšení výpočetní složitosti při trénování, aniž by se dostavily nějaké změny na efektivnosti výsledné sítě. Proto se zvolilo počátečních 16.
+
+## Part 3: Model Training
+
+Trénování modelu využívalo vytvořenou U-Netu, rozdělení datasetu na tři části, kombinaci dvou loss funkcí a early-stopping.
+
+### Rozdělení datasetu
+
+Dataset se rozdělil na tři části: trénovací, validační a testovací. Poměr těchto skupin by 70/15/15. Tento počet byl zvolen vzhledem k velikosti datasetu, jeho augmentaci a také protože to bylo zmíněno na přednášce.
+
+```python
+train_size = int(0.7 * len(ds)) # 70%
+val_size   = int(0.15 * len(ds)) # 15%
+test_size  = len(ds) - train_size - val_size # 100-70-15 = 15%
+```
+
+### Batch size
+
+Při trénování byl také zvolen batch size 8 primárně kvůli mé velikosti paměti, každopádně podle mého neformálního výzkumu, by zvýšení batch size na 16 či 32 nemělo výrazný efekt.
+
+### Ztrátová funkce
+
+Při trénování modelu byly vyzkoušeny dvě loss funkce, a to sice dice loss, binary cross-entropy loss a následně i jejich kombinace. Tato kombinace využívala obou funkcí zároveň, přičemž jejich poměr byl určován hodnotou alpha, která určovala "váhu" BCE. Např. pokud alpha=0.8, tak BCE mělo váhu 80% a dice pouze 20%; pokud by alpha=0.5, funkce by měly stejnou váhu.
+
+Nakonec se nejvíce osvědčilo použít buď BCE nebo dice; jejich kombinace měla úspěch pouze pokud byla alpha velmi nízká.
+
+### Early stop a počet epoch
+
+Počet epoch a early-stop spolu úzce souvisí, proto je popíši v rámci jedné podkapitoly.
+
+Počet epoch byl nastaven na 120, ovšem kvůli early-stop algoritmu se trénovací algoritmus dostal nejvýše na 30.
+
+Early-stop algoritmus po každé epoše zkontroluje validation loss; pokud se "zlepšila", tak algoritmus pokračuje dále, pokud se 5krát po sobě nezlepšila, trénování končí a dojde k obnovení nejlepší validační ztráty.
+Za zlepšení se považuje následující přepis: `val_loss < best_val_loss - 1e-5`
+
+### Visualizations of the process
+
+V této podkapitole lze najít grafy různých metrik, které byly měřeny během trénovaní sítě s různými parametry. Mezi těmito paramatry většinou najdeme ztrátovou funkci, neboť early-stop a počet vrtev sítě byl nastaven staticky a k jeho změnám nedocházelo často.
+
+Při zvolení ztrátové funkce BCE+Dice s váhou na BCE 0.9, trénování skončilo relativně rychle (po 12 epochách), ale hodnoty ztát dobré nebyly, viz. obrázek níže.
+
+![bcedice09.png](CNN%20implementation/out/test_predictions_25-11-06_08-50-55_bce09/loss_curves.png)
+![bcedice09.png](CNN%20implementation/out/test_predictions_25-11-06_08-50-55_bce09/dice_curve.png)
+
+Opakem bylo zvolení BCE s 0.1, což způsobilo, že se síť trénovala 59 epoch než narazila na early-stop, ovšem její výsledky byly v porovnání s předchozím pokusem přívětivější.
+
+![bcedice01.png](CNN%20implementation/out/test_predictions_25-11-06_09-05-23/loss_curves.png)
+![bcedice01.png](CNN%20implementation/out/test_predictions_25-11-06_09-05-23/dice_curve.png)
+
+Při zvolení BCE 0.5 (tj, obě ztrátové funkce měly stejnou váhu), tak výsledek byl opět lepší. Dosáhlo se toho, že se síť trénovala +-30 epoch se ztrátou < 0.1
+
+Při zvolení pouze BCE ztrátové funkce, se dosáhlo nejlepších výsledků v porovnání s ostaními pokusy. Počet epoch byl pouze 32, přičemž ztráty a dice vykazovaly lepší hodnoty než předešlé pokusy.
+
+![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/loss_curves.png)
+![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/dice_curve.png)
+
+## Part 4: Model Evaluation
+
+### Qualitative
+
+Kvalitativní evaluace modelu se provádí relativně těžce, protože výsledky se ukazují být lepší než ground truth. Toto je způsobeno, že v prvním úkolu se na tobule použila morfologická operace opening s obdélníkovým kernelem; výsledky sítě nejsou tedy tolik hranaté a působí "lépe".
+
+Zvolená síť nakonec nenesla významné kvantitativní výkyvy. Tyto výkyvy (např. false positive) byly popsány v předchozích kapitolách, a byly způsobeny "mělkou" sítí nebo špatnou kombinací ztrátové funkce.
+
+### Quantitative
+
+V této kapitole jsou zobrazeny kvantitativní evaluace nejlepší sítě.
+
+![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/prf1_curves.png)
+
+![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/iou_curve.png)
+
+![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/accuracy_curve.png)
+
+![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/conf_matrix_epoch_37.png)
+
+![bcedice05.png](./CNN%20implementation/out/test_predictions_25-11-06_10-23-06/progress_contours1(Copy).png)
+![bcedice05.png](./CNN%20implementation/out/test_predictions_25-11-06_10-23-06/progress_contours(Copy).png)
+
+## Part 5: Hyperparameter Tuning
+
+V projektu jsem použil U-Net, což je konvoluční encoder–decoder architektura pro segmentaci obrazu. Síť se skládá ze dvou částí:
+
+- encoder (downsampling): postupně zmenšuje rozlišení a zvyšuje počet filtrů, čímž extrahuje abstraktnější rysy z obrazu,
+
+- decoder (upsampling): obnovuje prostorové rozlišení, přičemž využívá skip-connections z encoderu, takže kombinujeme nízkoúrovňové detaily s vysokoúrovňovou semantikou.
+
+Každá úroveň obsahuje 2× konvoluci 3×3 a aktivaci ReLU. Mezi úrovněmi se používá MaxPooling (2×2) pro zmenšení rozlišení a transposed convolution (2×2) pro zvětšení rozlišení v decoderu. Výstupní vrstva je 1×1 konvoluce, která produkuje mapu logitů (1 kanál), vhodnou pro binární segmentaci pomocí BCEWithLogitsLoss.
+
+Při použítí U-Net s 2 vrstvami došlo ke zvýšení počtu pixelů jako false positive; při použítí 10 vrstev byl trénink zbytečně dlouhý.
+
+Jako nejlepší vyšla varianta pěti úrovní:
+
+- poskytuje dostatečnou reprezentaci i pro jemné detaily,
+
+- nemá tak velký počet parametrů, aby se přetrénovala,
+
+- má nejlepší poměr výkon / doba tréninku / paměť,
+
+- stabilní trénování a nejvyšší validační Dice a IoU.
+
+Average pooling měl problém se zachováním hran a textur; max pooling v tomto vyšel jako lepší možnost.
+
+## Ukázky výsledků
+
+![vysledek](./CNN%20implementation/out/test_predictions_25-11-06_10-23-06/test_preds/test_00076.png)
+
+![vysledek](./CNN%20implementation/out/test_predictions_25-11-06_10-23-06/test_preds/test_00040.png)
+
+![vysledek](./CNN%20implementation/out/test_predictions_25-11-06_10-23-06/test_preds/test_00077.png)
+
+![vysledek](./CNN%20implementation/out/test_predictions_25-11-06_10-23-06/test_preds/test_00028.png)
+
+
+
+# Assignment 3
+
+> Author: Kryštof Čejchan
+
+## Objective
+Implementace a evaluace klasifikačních modelů (CNN), analýza jejich rozhodování (XAI) a Siamské sítě.
+## Part 1: Classification (Original vs. Inpainted)
+
+### Příprava datasetu
+
+Dataset byl připraven z bitmapových obrazů z předešlých úloh. Dohromady měl dataset ± 300 obrazů, z toho 50% bylo inpainted a zbytek byl ponechán beze změn (50%).
+
+Pro inpainted byly použity masky cílií, které byly zdilatovány a následně pomocí funkce `cv.inpaint` bylo nejméně pět náhodných buněk "překresleno".
+
+<img alt="img_008.png" height="256" src="Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/img_008.png" width="256"/>
+<img alt="7.png" height="256" src="Advanced%20CNN,%20transfer%20learning,%20and%20XAI/data/orig_inpainted/inpainted/7.png" width="256"/>
+
+### Modely CNN
+
+#### Vlastní síť
+
+Feature Extractor: Série pěti konvolučních bloků, které postupně snižují prostorovou dimenzi obrazu a zvyšují hloubku příznaků (počet kanálů).
+
+Klasifikátor: Plně propojené (Fully Connected) vrstvy, které převádějí extrahované příznaky na finální predikci.
+
+Na vstupu je greyscale obrázek (tj. jeden kanál) s rozlišením 256x256. Další vrstvy jsou následujicí:
+
+
+| Část sítě    | Vrstva | Typ Operace      | Konfigurace                  | Výstupní Tenzor |
+|:-------------|:-------|:-----------------|:-----------------------------|:----------------|
+| Vstup        | -      | -                | -                            | (1, 256, 256)   |
+| Blok 1       | conv1  | Konvoluce + ReLU | k=5, s=1, p=2                | (16, 256, 256)  |
+| -            | pool1  | Max Pooling      | k=2, s=2                     | (16, 128, 128)  |
+| Blok 2       | conv2  | Konvoluce + ReLU | k=5, s=1, p=2                | (32, 128, 128)  |
+| -            | pool2  | Max Pooling      | k=2, s=2                     | (32, 64, 64)    |
+| Blok 3       | conv3  | Konvoluce + ReLU | k=3, s=1, p=1                | (64, 64, 64)    |
+| -            | pool3  | Max Pooling      | k=2, s=2                     | (64, 32, 32)    |
+| Blok 4       | conv4  | Konvoluce + ReLU | k=3, s=1, p=1                | (128, 32, 32)   |
+| -            | pool4  | Max Pooling      | k=2, s=2                     | (128, 16, 16)   |
+| Blok 5       | conv5  | Konvoluce + ReLU | k=3, s=1, p=1                | (256, 16, 16)   |
+| -            | pool5  | Max Pooling      | k=2, s=2                     | (256, 8, 8)     |
+| Flatten      | -      | Zploštění        | -                            | (256 * 64)      |
+| Klasifikátor | fc1    | Linear + ReLU    | Vstup: 256 * 64, Výstup: 512 | (512)           |
+| -            | fc2    | Linear + ReLU    | Vstup: 512, Výstup: 128      | (128)           |
+| -            | fc3    | Linear (Logits)  | Vstup: 128, Výstup: 2        | (2)             |
+
+`k = kernel_size; s = stride; p = padding`
+
+
+#### Transfer learning
+
+Standardní ResNet18 je navržen pro barevné RGB obrázky (3 kanály) a klasifikaci do 1000 tříd. Pro potřeby této úlohy (greyscale obrázky [1 kanál], klasifikace do 2 tříd) byly provedeny následující modifikace:
+
+1. Adaptace vstupní vrstvy (Grayscale)
+
+   Původní vstupní konvoluční vrstva (conv1) očekává 3 vstupní kanály (RGB). Jelikož pracujeme s černobílými (grayscale) obrázky (1 kanál), byla tato vrstva nahrazena novou konvolucí:
+
+   Původní: in_channels=3
+   Nová: in_channels=1 (ostatní parametry jako kernel size, stride a padding zůstaly zachovány).
+
+   Aby se nepřišlo o naučené informace z RGB verze, váhy nové vrstvy nebyly inicializovány náhodně. Místo toho byl vypočítán průměr vah přes původní 3 kanály.
+
+    ```py
+    self.model.conv1.weight.data = original_conv1.weight.data.mean(dim=1, keepdim=True)
+    ```
+
+   Tato technika umožňuje síti reagovat na strukturní rysy v černobílém obraze podobně, jako by reagovala na jasovou složku barevného obrazu.
+
+2. Úprava klasifikační hlavy (Head)
+
+   Původní plně propojená vrstva (fc), která mapovala příznaky na 1000 tříd ImageNetu, byla odstraněna a nahrazena novou lineární vrstvou odpovídající našemu zadání:
+
+   Vstup: 512 příznaků (výstup z posledního ResNet bloku).
+
+   Výstup: num_classes (v našem případě 2: Original vs. Inpainted).
+
+3. Strategie trénování (Freezing)
+
+   Třída podporuje parametr freeze_base, který umožňuje zmrazit váhy extraktoru příznaků:
+
+   Pokud freeze_base=True: Gradienty se počítají pouze pro novou klasifikační hlavu (fc). To je vhodné pro rychlé doladění (fine-tuning), kdy předpokládáme, že naučené příznaky z ImageNetu jsou dostatečně obecné.
+
+   Pokud freeze_base=False (výchozí v kódu): Trénuje se celá síť. Váhy z ImageNetu slouží jako velmi kvalitní startovní bod inicializace, ale během tréninku se jemně přizpůsobují specifikům datasetu cílií.
+
+### Trénink
+
+1. Rozdělení a příprava dat
+
+   Data jsou načítána z adresářové struktury, kde jsou třídy (original, inpainted) odděleny do podadresářů. Před samotným trénováním probíhá následující zpracování:
+
+   Rozdělení datasetu: Všechny dostupné snímky jsou náhodně zamíchány a rozděleny na tři disjunktní sady na základě definovaných poměrů (70/15/15):
+
+   Trénovací sada: Slouží k optimalizaci vah modelu.
+
+   Validační sada: Slouží k průběžnému vyhodnocování modelu a rozhodování o předčasném ukončení (Early Stopping).
+
+   Testovací sada: Použita výhradně po skončení trénování pro finální změření výkonnosti modelu.
+
+   Data Augmentace: Pro zvýšení robustnosti modelu a prevenci přeučení (overfitting) je na trénovací sadu aplikována augmentace dat ve formě rotací o 90°, 180° a 270°. Validační a testovací sady zůstávají bez rotací (úhel 0°).
+
+2. Konfigurace trénování
+
+   Pro optimalizaci modelu byly zvoleny následující parametry a komponenty:
+
+   Ztrátová funkce: Byla použita CrossEntropyLoss
+
+   Optimalizátor: Byl zvolen algoritmus Adam (Adaptive Moment Estimation), který efektivně přizpůsobuje rychlost učení pro jednotlivé parametry sítě.
+
+   Model: Skript využívá třídu ResNetClassifier nebo Net (podle toho, zda se jedná o transfer learning nebo ne), která je inicializována a přesunuta na výpočetní zařízení CPU.
+
+3. Trénovací smyčka a Early Stopping
+
+   Trénování probíhá v cyklech (epochách). Každá epocha se skládá ze dvou fází:
+
+   Trénovací fáze (model.train()):
+
+   Model zpracovává data po dávkách (batches).
+
+   Pro každou dávku se vypočítá chyba (loss), provedou se zpětné propagace (backpropagation) a aktualizují se váhy pomocí optimalizátoru.
+
+   Validační fáze (model.eval()):    
+   Model je přepnut do evaluačního režimu (vypnutí dropoutu, fixace batch norm).
+
+   Bez výpočtu gradientů (torch.no_grad()) se provede predikce na validační sadě.
+
+   Výpočet metrik: Výstupy sítě (logity pro 2 třídy) jsou transformovány na binární predikci rozdílem skóre (class_1 - class_0), což umožňuje výpočet Accuracy, Precision, Recall a F1-Score pomocí třídy Metrics.
+
+   Strategie Early Stopping (Předčasné zastavení): Aby se předešlo přeučení a plýtvání výpočetním časem, je implementován mechanismus Early Stopping.
+
+   Monitoruje se hodnota validační ztráty (validation loss).
+
+   Pokud je aktuální validační ztráta nižší než doposud nejlepší zaznamenaná, model (jeho váhy) se uloží jako nejlepší kandidát.
+
+   Pokud se ztráta nezlepší po stanovený počet epoch (parametr PATIENCE), trénování je automaticky ukončeno.
+
+4. Vizualizace a finální testování
+
+   Po ukončení tréninku skript generuje grafy průběhu:
+
+   Loss Graph: Porovnání vývoje trénovací a validační chyby v čase.
+
+   Accuracy Graph: Vývoj přesnosti modelu na validační sadě.
+
+   V poslední fázi se načtou váhy modelu s nejnižší validační chybou (nikoliv váhy z poslední epochy) a provede se inferenece na testovací sadě.
+
+   Snímky jsou na základě predikce fyzicky roztříděny do složek predicted_original a predicted_inpainted pro vizuální kontrolu.
+
+   Jsou vypočítány finální metriky výkonnosti na datech, která model během tréninku nikdy neviděl.
+
+### Výstupy
+Moje síť:
+
+![accuracy_net.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/accuracy_net.png)
+
+Transfer learning:
+
+![accuracy_net.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/accuracy_net.png)
+
+Moje síť:
+
+![graph_loss_net.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/graph_loss_net.png)
+
+Transfer learning:
+
+![graph_loss_net.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/graph_loss_net.png)
+
+
+
+
+Moje síť:
+
+![confusion_matrix.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/confusion_matrix.png)
+
+| Metrika   | Skóre  |
+|-----------|--------|
+| Precision | 0.7391 |
+| Recall    | 1.0000 |
+| F1-Score  | 0.8500 |
+| IoU       | 0.7391 |
+
+
+Transfer learning:
+
+![confusion_matrix.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/confusion_matrix.png)
+
+
+| Metrika   | Skóre  |
+|-----------|--------|
+| Precision | 1.0000 |
+| Recall    | 1.0000 |
+| F1-Score  | 1.0000 |
+| IoU       | 1.0000 |
+
+
+## Part 2: Model Interpretability
+
+Pro validaci rozhodovacího procesu neuronové sítě a ověření, zda se model zaměřuje na relevantní vizuální znaky, byla implementována sada metod pro vysvětlitelnou umělou inteligenci (Explainable AI - XAI). K tomuto účelu byla využita knihovna Captum, která umožňuje analyzovat příspěvky jednotlivých pixelů k finální predikci modelu.
+
+Analýza byla provedena na natrénovaném modelu (Net nebo ResNetClassifier) s využitím tří odlišných gradientních metod. Každá z nich poskytuje jiný pohled na to, co model považuje za důležité.
+
+Použité metody vizualizace
+
+1. Saliency (Gradient-based):
+
+   Základní metoda, která počítá gradient výstupu vzhledem ke vstupnímu obrázku. Výsledná mapa indikuje, které pixely by při malé změně nejvíce ovlivnily výsledné skóre třídy.
+
+   Vizualizace: Používá absolutní hodnotu gradientů (sign="absolute_value") a barevnou mapu inferno, aby zvýraznila oblasti s nejvyšší citlivostí bez ohledu na směr vlivu.
+
+
+2. Integrated Gradients (IG):
+
+   Tato metoda řeší problém saturace gradientů integrováním gradientů podél cesty od referenčního "nulového" vstupu (černý obrázek) k aktuálnímu vstupu. Poskytuje stabilnější a méně zašuměné výsledky než prostá Saliency mapa.
+
+   Vizualizace: Zobrazuje pouze pozitivní příspěvky (sign="positive", mapa Reds), tedy ty oblasti, které přímo zvyšují pravděpodobnost predikované třídy.
+
+3. Guided Grad-CAM:
+
+   Kombinuje lokalizační schopnost metody Grad-CAM s detailním rozlišením Guided Backpropagation. Tato metoda sleduje aktivace v poslední konvoluční vrstvě sítě, která obsahuje nejvyšší úroveň sémantické informace.
+
+   Konfigurace: Jako cílová vrstva (target_layer) byla pro vlastní síť Net zvolena vrstva conv5 (u ResNetu by to byl poslední blok layer4). Tato vrstva slouží jako zdroj pro výpočet vah důležitosti jednotlivých map příznaků.
+
+   Vizualizace: Výstupem je detailní mapa (mapa viridis), která zvýrazňuje klíčové struktury (např. hrany nebo textury řasinek) vedoucí k rozhodnutí.
+
+### Moje síť
+![compare_18.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/compare_18.png)
+
+![compare_98.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/compare_98.png)
+
+![compare_99.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/compare_99.png)
+
+![compare_102.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/compare_102.png)
+
+### Resnet
+
+![compare_0.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/compare_0.png)
+
+![compare_1.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/compare_1.png)
+
+![compare_10.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/compare_10.png)
+
+![compare_55.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/compare_55.png)
+
+![compare_62.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/compare_62.png)
+
+
+### Porovnání (moje síť vs resnet)
+![compare_0.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/compare_0.png)
+
+![compare_0.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/compare_0.png)
+
+![compare_99.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/compare_99.png)
+
+![compare_99.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/compare_99.png)
+
+## Part 3: Siamese Networks
+Pro úlohu detekce inpaintingu byla implementována Siamská neuronová síť (Siamese Neural Network). Na rozdíl od klasických klasifikačních sítí, které se učí přiřadit vstupu konkrétní třídu, se siamská síť učí metriku podobnosti. Cílem je transformovat vstupní obrázky do vektorového prostoru (embedding space) tak, aby vektory obrázků stejné třídy byly blízko u sebe a vektory rozdílných tříd daleko od sebe.
+
+1. Architektura modelu
+
+   Jako základ (backbone) modelu byl zvolen ResNet18, předtrénovaný na ImageNetu, což zajišťuje robustní extrakci příznaků.
+
+   Adaptace vstupu: Jelikož vstupní data jsou černobílá (1 kanál), byla první konvoluční vrstva ResNetu modifikována. Původní váhy pro 3 RGB kanály byly zprůměrovány do jednoho kanálu, což umožňuje využít předtrénované informace i pro grayscale vstupy.
+
+   Sdílené váhy: Síť se skládá ze dvou identických větví, které sdílejí tytéž váhy. Oba obrázky z páru procházejí stejnou transformací.
+
+   Embedding vrstva: Původní klasifikační hlava ResNetu byla nahrazena sekvencí Linear -> ReLU -> Linear, která mapuje extrahované příznaky do 128-dimenzionálního výstupního vektoru.
+
+2. Příprava dat a párování
+
+   Pro trénování siamské sítě je klíčová tvorba párů. Třída SiameseDataset generuje trénovací vzorky dynamicky:
+
+   Pozitivní pár (Label 0): Dva různé obrázky stejné třídy (např. Original–Original nebo Inpainted–Inpainted).
+
+   Negativní pár (Label 1): Dva obrázky rozdílných tříd (Original–Inpainted).
+
+   Vyvážení: Dataset je konstruován tak, aby pravděpodobnost výběru pozitivního a negativního páru byla 50:50, což zabraňuje biasu sítě k jedné z variant.
+
+3. Ztrátová funkce (Contrastive Loss)
+
+   K optimalizaci vah byla použita funkce Contrastive Loss. Tato funkce pracuje s Euklidovskou vzdáleností Dw
+   mezi výstupními vektory sítě.
+
+4. Průběh trénování
+
+   Trénování probíhá pomocí optimalizátoru Adam s learning rate 0.0005.
+
+   Evaluace přesnosti: Přesnost modelu není měřena klasicky, ale na základě prahování vzdálenosti. Pokud je vzdálenost mezi vektory menší než threshold=margin/2, je pár klasifikován jako "shodný".
+
+   Early Stopping: Pro zabránění přeučení je monitorována validační ztráta (Loss). Pokud se nezlepší po stanovený počet epoch (PATIENCE), trénování je předčasně ukončeno a uloží se model s nejnižší validační chybou.
+
+### Metriky
+#### VÝSLEDKY EVALUACE (Threshold=0.5)
+| Metrika  | Skóre |
+|----------|-------|
+| Accuracy | 0.6   |
+| Recall   | 0.72  |
+| F1-Score | 0.51  |
+| IoU      | 0.6   |
+
+| Metrika  | Skóre |
+|----------|-------|
+| Accuracy | 0.6   |
+| Recall   | 0.72  |
+| F1-Score | 0.51  |
+| IoU      | 0.6   |
+
+| Třída (Class)    | Precision | Recall | F1-Score | Support |
+|:-----------------|:---------:|:------:|:--------:|:-------:|
+| **Stejné (0)**   |   0.51    |  0.72  |   0.60   |   25    |
+| **Různé (1)**    |   0.72    |  0.51  |   0.60   |   35    |
+|                  |           |        |          |         |
+| **Accuracy**     |           |        | **0.60** | **60**  |
+| **Macro Avg**    |   0.62    |  0.62  |   0.60   |   60    |
+| **Weighted Avg** |   0.63    |  0.60  |   0.60   |   60    |
+
+
+![training_metrics_siam.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/siam/training_metrics_siam.png)
+![siamese_embeddings_vis.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/siam/siamese_embeddings_vis.png)
+![siamese_confusion_matrix.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/siam/siamese_confusion_matrix.png)
