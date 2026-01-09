@@ -1,4 +1,8 @@
-# Úkol č. 1
+# Medical-Image-Processing
+
+
+
+# Segmentation using traditional methods
 
 **Autor: Kryštof Čejchan**
 ## Úvod
@@ -256,7 +260,7 @@ V následujicí tabulce popisuji, jak ve výsledku dopadl můj projekt.
 
 
 
-# Assingment 02
+# CNN implementation
 
 Cílem tohoto úkolu bylo využít dataset z prvního úkolu a natrénovat na něm síť U-Net.
 
@@ -540,7 +544,7 @@ Average pooling měl problém se zachováním hran a textur; max pooling v tomto
 
 
 
-# Assignment 3
+# Advanced CNN, transfer learning, and XAI
 
 > Author: Kryštof Čejchan
 
@@ -861,7 +865,7 @@ Pro úlohu detekce inpaintingu byla implementována Siamská neuronová síť (S
 ![siamese_confusion_matrix.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/siam/siamese_confusion_matrix.png)
 
 
-# Assignment 4
+# Movement detection & optical flow
 
 > Autor: Kryštof Čejchan
 
