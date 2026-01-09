@@ -1,0 +1,12 @@
+{
+  "best_val_loss": 0.03757255806424523,
+  "final_test_loss": 0.036498670700375595,
+  "final_test_dice": 0.9452681878338689,
+  "final_test_acc": 0.984162058910178,
+  "final_test_prec": 0.9391357036379501,
+  "final_test_rec": 0.9522711341238564,
+  "final_test_f1": 0.9456578074527838,
+  "final_test_iou": 0.8969173520108701,
+  "epochs_trained": 30,
+  "threshold": 0.5
+}
