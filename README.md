@@ -12,7 +12,7 @@ V tomto dokumentu popisuji, čím se první úkol zabýval, jak jsem tento úkol
 
 První projekt se zabývá využitím monadických a morfologických operací nad bitmapovými obrázky, jejich binarizací, a interpretací.
 
-<img alt="Tv21.tiff" height="510" src="segmentation%20-%20traditional%20methods/pics/popisprojektu.png" width="685"/>
+<img alt="Tv21.tiff" height="510" src="Segmentation%20using%20traditional%20methods/pics/popisprojektu.png" width="685"/>
 
 Na vstupu je grey-scale bitmapový obrázek.
 
@@ -29,7 +29,7 @@ Tato kapitola se zabývá, jak lze daný Python skript spustit a jak program vyu
 ### Spuštění programu
 Program se spouští pomocí `main.py` souboru, který otevře GUI.
 
-![img.png](segmentation%20-%20traditional%20methods/pics/run_script.png)
+![img.png](Segmentation%20using%20traditional%20methods/pics/run_script.png)
 
 Nyní je program "prázdný" a nelze využívat jeho funkcionality.
 ### Používání programu
@@ -44,7 +44,7 @@ Poté lze využívat operace, které jsou v horním menu.
 - **View**: slouží ke smazání provedených operací na obrázku
 - **Pipelines**: obsahuje předvytvořené posloupnosti operací pro splnění cíle zadání
 
-![img.png](segmentation%20-%20traditional%20methods/pics/ukazka_programu.png)
+![img.png](Segmentation%20using%20traditional%20methods/pics/ukazka_programu.png)
 
 ### Orientace ve zdrojovém kódu
 Tato podkapitola se zabývá strukturou projektu z pohledu zdrojového kódu a dalších potřebných adresářů.
@@ -83,16 +83,16 @@ def pipeline1(img: np.ndarray) -> np.ndarray:
 Funkce nejprve aplikuje dvě základní operace: zvýší jas a sníží gammu. Tyto dvě operace, ačkoliv jsou jednoduché, efektivně 
 zajistí, že na obrázku zůstanou pouze ty nejvýraznější objekty, tj. v podstatě se smaže nežádaný šum na pozadí; viz. obrázek níže
 
-![img.png](segmentation%20-%20traditional%20methods/pics/brightgamma1.png)
+![img.png](Segmentation%20using%20traditional%20methods/pics/brightgamma1.png)
 
 Po použití CLAHE a median filtrů se vyhladí další drobný šum. (Median filter je v cyklu, protože OpenCV nedovoluje nastavit kernel size větší než 4)
 Následuje negace a OTSU, které zajistí binarizaci.
 
-![img.png](segmentation%20-%20traditional%20methods/pics/clahe_otsu1.png)
+![img.png](Segmentation%20using%20traditional%20methods/pics/clahe_otsu1.png)
 
 Pro odstranění dalších nežádoucích objektů se použije opening, který tyto objekty "ořeže" natolik, že při hledání contour, se nezaznamenají.
 
-![img.png](segmentation%20-%20traditional%20methods/pics/opening1.png)
+![img.png](Segmentation%20using%20traditional%20methods/pics/opening1.png)
 
 Výsledkem tohoto je množina obdélníkových obrázků grey-scale buňek. Tyto obrázky projdou další fází: binarizací a hledáním jader v buňce.
 ```python
@@ -108,20 +108,20 @@ def roi_binarization1(img: np.ndarray) -> np.ndarray:
 ```
 Nejprve se spustí erosion, která zvýrazný a zvětší černé části obrázku; v našem případě se jedná o jádra buňky.
 
-![img.png](segmentation%20-%20traditional%20methods/pics/cellerso1.png)
+![img.png](Segmentation%20using%20traditional%20methods/pics/cellerso1.png)
 
 Dále se aplikuje gaussian filter, který decentně rozmaže černé tečky, které vznikly po erosion.
 Po negaci obrázku se sníží gamma (kdyby se obrázek neznegoval, gamma by se dala zvýšit pro podobný efekt). Výsledkem úpravy gammy je
 obrázek se zvýrazněnými bílými buňkami.
 
-![img.png](segmentation%20-%20traditional%20methods/pics/cellgamma1.png)
+![img.png](Segmentation%20using%20traditional%20methods/pics/cellgamma1.png)
 
 Po použití OTSU, je obrázek dokonán (alespoň v tomto případě); obecně to ale platit nemusí, proto ještě
 použijeme opening. Opening se zde používá s tvarem `cv.MORPH_RECT`, protože bylo zjištěno, že obdélníkový tvar lépe
 odděluje jádra, která jsou blízko u sebe, než elipsa.
 
-![img.png](segmentation%20-%20traditional%20methods/pics/cellotsu.png)
-![img_1.png](segmentation%20-%20traditional%20methods/pics/cell_open1.png)
+![img.png](Segmentation%20using%20traditional%20methods/pics/cellotsu.png)
+![img_1.png](Segmentation%20using%20traditional%20methods/pics/cell_open1.png)
 
 Vzhledem k tomu, že u drtivé většiny obrázků, se prostřední dvě jádra spojí do jednoho, byla zvolena metoda, která do prostředního jádra
 vloží černou úsečku. Viz. kód níže.
@@ -196,7 +196,7 @@ def apply_pipeline(self, pipeline_number: int, contour_rect_size:int, binarizati
         self.save_rects_current() #otevře dialog pro vybrání cílového adresáře a uloží tam output (binarizované a grey-scale obrázky  = dataset)
 ```
 
-![binary_roi_006.png](segmentation%20-%20traditional%20methods/pics/pipeline_1/img1/binary_roi_006.png)
+![binary_roi_006.png](Segmentation%20using%20traditional%20methods/pics/pipeline_1/img1/binary_roi_006.png)
 
 ### Přehled naimplementovaných operací
 Základní **jednoobrázkové (monadické)** operace – mění vlastnosti jasu, kontrastu a intenzity pixelů.
