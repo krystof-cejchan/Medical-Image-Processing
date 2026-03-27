@@ -1,343 +1,335 @@
 # Medical-Image-Processing
 
-
-
 # Segmentation using traditional methods
 
-**Autor: Kryštof Čejchan**
-## Úvod
-V tomto dokumentu popisuji, čím se první úkol zabýval, jak jsem tento úkol řešil, a jaké jsou výsledky.
+**Author: Kryštof Čejchan**
+## Introduction
+In this document, I describe what the first task was about, how I solved this task, and what the results are.
 
-## Popis projektu
+## Project description
 
-První projekt se zabývá využitím monadických a morfologických operací nad bitmapovými obrázky, jejich binarizací, a interpretací.
+The first project deals with the use of monadic and morphological operations on bitmap images, their binarization, and interpretation.
 
 <img alt="Tv21.tiff" height="510" src="Segmentation%20using%20traditional%20methods/pics/popisprojektu.png" width="685"/>
 
-Na vstupu je grey-scale bitmapový obrázek.
+The input is a grey-scale bitmap image.
 
-1. Obrázek projde pre-processingem, který odstraní nežádoucí objekty z obrázku, a zvýrazní žádoucí objekty v obrázku.
-2. Obrázek se zbinarizuje, přičemž požedované objekty jsou v bílé barvě, zbytek je černý
-3. Z původního grey-scale obrázku se vyříznou ty části, které jsou na binárním obrázku bílé
-4. Tyto části projdou další vlnou operací, přičemž na konci je opět binární obrázek; avšak nyní se jedná už danou "buňku"
+1. The image undergoes pre-processing, which removes unwanted objects from the image and highlights the desired objects in the image.
+2. The image is binarized, with the desired objects in white, the rest in black
+3. The parts that are white in the binary image are cut out from the original gray-scale image
+4. These parts go through another wave of operations, with the end result being a binary image again; but this time it is a given "cell"
 
-V nadcházejících kapitolách popíši přesné operace, které byly testovány nebo využity.
-## Popis programu
-Tato kapitola se zabývá, jak lze daný Python skript spustit a jak program využívat.
+In the coming chapters I will describe the exact operations that were tested or used.
+## Program description
+This chapter deals with how to run the given Python script and how to use the program.
 
-**Upozornění: program má grafické uživatelské rozhraní, proto je potřeba mít naistalovanou knihovnu tkinter (https://docs.python.org/3/library/tkinter.html)**
-### Spuštění programu
-Program se spouští pomocí `main.py` souboru, který otevře GUI.
+**Warning: the program has a graphical user interface, so you need to have the tkinter library installed (https://docs.python.org/3/library/tkinter.html)**
+### Running the program
+The program is started using the `main.py` file, which opens the GUI.
 
 ![img.png](Segmentation%20using%20traditional%20methods/pics/run_script.png)
 
-Nyní je program "prázdný" a nelze využívat jeho funkcionality.
-### Používání programu
-Prvně musíme vybrat vstupní obrázek pomocí `File>Open...`.
-Poté lze využívat operace, které jsou v horním menu.
+Now the program is "empty" and its functionality cannot be used.
+### Using the program
+First we need to select the input image using `File>Open...`.
+Then we can use the operations in the top menu.
 
-- **File**: slouží k otevírání a ukládání obrázků, a ukončení programu.
-- **Adjust**: obsahuje primárně operace z první přednášky; tj. monadické operace
-- **Process**: obsahuje primárně operace z druhé přednášky; tj. morfologické operace
-- **Filters&Blurs**: obsahuje primárně operace z třetí přednášky; tj. filtry a rozmazávání obrázku
-- **Histograms**: slouží k zobrazování histogramů a CDF (cumulative distribution function), a nabízí také operace spojené s histogramem (ekvivalizace a CLAHE)
-- **View**: slouží ke smazání provedených operací na obrázku
-- **Pipelines**: obsahuje předvytvořené posloupnosti operací pro splnění cíle zadání
+- **File**: used to open and save images, and exit the program.
+- **Adjust**: contains primarily operations from the first lecture; i.e. monadic operations
+- **Process**: contains primarily operations from the second lecture; i.e. morphological operations
+- **Filters&Blurs**: contains primarily operations from the third lecture; i.e. filters and image blurring
+- **Histograms**: used to display histograms and CDF (cumulative distribution function), and also offers operations related to histogram (equalization and CLAHE)
+- **View**: used to delete performed operations on the image
+- **Pipelines**: contains pre-created sequences of operations to meet the task objective
 
 ![img.png](Segmentation%20using%20traditional%20methods/pics/ukazka_programu.png)
 
-### Orientace ve zdrojovém kódu
-Tato podkapitola se zabývá strukturou projektu z pohledu zdrojového kódu a dalších potřebných adresářů.
+### Orientation in the source code
+This subsection deals with the project structure from the point of view of the source code and other necessary directories.
 
-- `./main.py` je spouštěcí skript, volá třídu `ImageEditorApp`, která spustí GUI
-- `./image_editor_ui.py` obsahuje třídu s GUI komponentami (tlačítka, textová pole, apod.), tato třída také ukládá vstupní a editovaný obrázek. Bohužel je soubor velice obsáhlý, protože GUI obsahuje mnoho komponent.
-- `./image_operations/*.py` obsahuje naimplementované operace, které byly testovány nebo použity
-  - `monadic_operations.py` obsahuje monadické operace, např. negace, kvantizace, nebo úpravu jasu, gammy, kontrastu
-  - `advanced_operations.py` obsahuje "pokročilejší" operace jako např. CLAHE, erosion, dilatation, opening, closing, hledání kontur, nebo dokonce rozdělení spojených "buněk"
-  - `filters.py` obsahuje operace filtrování a rozmazání, např.: gaussian blur, difference of gaussians, laplacian of gaussian...
-  - `pipelines.py` obsahuje předvytvořené sekvence operací, které se spustí za účelem splnění cíle úkolu
-- `./utils/*.py` obsahuje pomocné metody, např pro převod mězi Float ⟨0,1⟩ -> uint8 ⟨0,255⟩, a obsahuje fukce pro výpočet histogramu a CDF
+- `./main.py` is a startup script, it calls the `ImageEditorApp` class, which starts the GUI
+- `./image_editor_ui.py` contains a class with GUI components (buttons, text fields, etc.), this class also stores the input and edited image. Unfortunately, the file is very large because the GUI contains many components.
+- `./image_operations/*.py` contains implemented operations that have been tested or used
+- `monadic_operations.py` contains monadic operations, e.g. negation, quantization, or brightness, gamma, contrast adjustment
+- `advanced_operations.py` contains "more advanced" operations such as CLAHE, erosion, dilatation, opening, closing, contour finding, or even splitting connected "cells"
+- `filters.py` contains filtering and blurring operations, e.g.: gaussian blur, difference of gaussians, laplacian of gaussian...
+- `pipelines.py` contains pre-created sequences of operations that will be run in order to fulfill the task's goal
+- `./utils/*.py` contains helper methods, e.g. for converting between Float ⟨0.1⟩ -> uint8 ⟨0.255⟩, and contains functions for calculating histogram and CDF
 
-
-## Řešení úkolu
-Díky implementaci GUI jsem měl možnost si hrát s různými operacemi, testovat jejich parametry, a přitom ihned vidět výsledek.
-Při řešení jsem implemetovat několik pipeline, ovšem nakonec jsem ponechal pouze jednu, která měla nejlepší výsledky.
-Každá pipeline obsahuje dvě části:
-1) operace nad vstupním obrázek
-2) operace nad ROI (rectangle of interest)
+## Solution to the task
+Thanks to the GUI implementation, I had the opportunity to play with different operations, test their parameters, and see the result immediately.
+When solving the problem, I implemented several pipelines, but in the end I kept only one that had the best results.
+Each pipeline contains two parts:
+1) operations on the input image
+2) operations on the ROI (rectangle of interest)
 ### Pipeline 1
-Tato pipeline nakonec vzešla jako ta nejlepší.
+This pipeline ultimately came out as the best.
 ```python
 def pipeline1(img: np.ndarray) -> np.ndarray:
-    im = img.copy() 
-    im = adjust_brightness(im, brightness=0.4) #pre-processing
-    im = adjust_gamma(im, gamma=0.1)
-    im = clahe(im, clip_limit=3, tile_grid=16)
-    for _ in range(30):
-        im = median_filter(im, ksize=3)
-    im = negate(im) # binarizace
-    im = otsu(im)
-    im = opening(im, 10) # post-processing
-    return im
+im = img.copy()
+im = adjust_brightness(im, brightness=0.4) #pre-processing
+im = adjust_gamma(im, gamma=0.1)
+im = clahe(im, clip_limit=3, tile_grid=16)
+for _ in range(30):
+im = median_filter(im, ksize=3)
+im = negate(im) # binarization
+im = otsu(im)
+im = opening(im, 10) # post-processing
+return im
 ```
-Funkce nejprve aplikuje dvě základní operace: zvýší jas a sníží gammu. Tyto dvě operace, ačkoliv jsou jednoduché, efektivně 
-zajistí, že na obrázku zůstanou pouze ty nejvýraznější objekty, tj. v podstatě se smaže nežádaný šum na pozadí; viz. obrázek níže
+The function first applies two basic operations: it increases the brightness and reduces the gamma. These two operations, although simple, effectively
+ensure that only the most prominent objects remain in the image, i.e., it essentially removes unwanted background noise; see. image below
 
 ![img.png](Segmentation%20using%20traditional%20methods/pics/brightgamma1.png)
 
-Po použití CLAHE a median filtrů se vyhladí další drobný šum. (Median filter je v cyklu, protože OpenCV nedovoluje nastavit kernel size větší než 4)
-Následuje negace a OTSU, které zajistí binarizaci.
+After using CLAHE and median filters, another small noise is smoothed. (Median filter is in a loop because OpenCV does not allow setting kernel size larger than 4)
+Next is negation and OTSU, which provide binarization.
 
 ![img.png](Segmentation%20using%20traditional%20methods/pics/clahe_otsu1.png)
 
-Pro odstranění dalších nežádoucích objektů se použije opening, který tyto objekty "ořeže" natolik, že při hledání contour, se nezaznamenají.
+5 000 / 5 000
+To remove other unwanted objects, opening is used, which "cuts" these objects so much that they are not recorded when searching for contours.
 
 ![img.png](Segmentation%20using%20traditional%20methods/pics/opening1.png)
 
-Výsledkem tohoto je množina obdélníkových obrázků grey-scale buňek. Tyto obrázky projdou další fází: binarizací a hledáním jader v buňce.
+The result of this is a set of rectangular gray-scale images of cells. These images go through the next phase: binarization and searching for nuclei in the cell.
 ```python
 def roi_binarization1(img: np.ndarray) -> np.ndarray:
-    im = img.copy()
-    im = erosion(im, erosion_size=1, interations_no=3)
-    im = gaussian_blur(im, ksize=5, sigma=0)
-    im = negate(im)
-    im = adjust_gamma(im, gamma=0.16)
-    im = otsu(im)
-    im = opening(im, size=4, shape=cv.MORPH_RECT, iterations_no=1)
-    return im
+im = img.copy()
+im = erosion(im, erosion_size=1, interactions_no=3)
+im = gaussian_blur(im, ksize=5, sigma=0)
+im = negate(im)
+im = adjust_gamma(im, gamma=0.16)
+im = otsu(im)
+im = opening(im, size=4, shape=cv.MORPH_RECT, iterations_no=1)
+return im
 ```
-Nejprve se spustí erosion, která zvýrazný a zvětší černé části obrázku; v našem případě se jedná o jádra buňky.
+First, erosion is run, which highlights and enlarges the black parts of the image; in our case, these are the cell nuclei.
 
 ![img.png](Segmentation%20using%20traditional%20methods/pics/cellerso1.png)
 
-Dále se aplikuje gaussian filter, který decentně rozmaže černé tečky, které vznikly po erosion.
-Po negaci obrázku se sníží gamma (kdyby se obrázek neznegoval, gamma by se dala zvýšit pro podobný efekt). Výsledkem úpravy gammy je
-obrázek se zvýrazněnými bílými buňkami.
+Next, a gaussian filter is applied, which subtly blurs the black dots that appeared after erosion.
+After negating the image, the gamma is reduced (if the image were not negated, the gamma could be increased for a similar effect). The result of the gamma adjustment is an image with white cells highlighted.
 
 ![img.png](Segmentation%20using%20traditional%20methods/pics/cellgamma1.png)
 
-Po použití OTSU, je obrázek dokonán (alespoň v tomto případě); obecně to ale platit nemusí, proto ještě
-použijeme opening. Opening se zde používá s tvarem `cv.MORPH_RECT`, protože bylo zjištěno, že obdélníkový tvar lépe
-odděluje jádra, která jsou blízko u sebe, než elipsa.
+After using OTSU, the image is complete (at least in this case); in general, this may not be the case, so we will use opening. Opening is used here with the shape `cv.MORPH_RECT`, because it has been found that a rectangular shape is better at separating nuclei that are close together than an ellipse.
 
 ![img.png](Segmentation%20using%20traditional%20methods/pics/cellotsu.png)
 ![img_1.png](Segmentation%20using%20traditional%20methods/pics/cell_open1.png)
 
-Vzhledem k tomu, že u drtivé většiny obrázků, se prostřední dvě jádra spojí do jednoho, byla zvolena metoda, která do prostředního jádra
-vloží černou úsečku. Viz. kód níže.
+Since in the vast majority of images the middle two kernels merge into one, a method was chosen that inserts a black line into the middle kernel. See the code below.
 ```python
 def split_middle_cell(img, line_thickness=2):
-    _, contours = find_contours(img, 30) #najde jádra
-    h, w = img.shape[:2]
-    cx, cy = w / 2.0, h / 2.0  
+_, contours = find_contours(img, 30) #finds kernels
+h, w = img.shape[:2]
+cx, cy = w / 2.0, h / 2.0
 
-    best = None
-    best_abs_d = float("inf")
+best = None
+best_abs_d = float("inf")
 
-    for c in contours: # pomocí pointPolygonTest, najde tu konturu, která je nejblíže středu obrázku
-        d = cv.pointPolygonTest(c, (cx, cy), True)
-        if abs(d) < best_abs_d:
-            best_abs_d = abs(d)
-            best = c
+for c in contours: # using pointPolygonTest, finds the contour that is closest to the center of the image
+d = cv.pointPolygonTest(c, (cx, cy), True)
+if abs(d) < best_abs_d:
+best_abs_d = abs(d)
+best = c
 
-    middle_contour = best
+middle_contour = best
 
-    x, y, bw, bh = cv.boundingRect(middle_contour)
-    x0 = max(0, x)
-    y0 = max(0, y)
-    x1 = min(w, x + bw)
-    y1 = min(h, y + bh)
+x, y, bw, bh = cv.boundingRect(middle_contour)
+x0 = max(0, x)
+y0 = max(0, y)
+x1 = min(w, x + bw)
+y1 = min(h, y + bh)
 
-    y_line = int((y0 + y1) / 2)
-    cv.line(img, (x0, y_line), (x1, y_line), (0, 0, 0), thickness=line_thickness) #do středu "namaluje" černou úsečku
+y_line = int((y0 + y1) / 2)
+cv.line(img, (x0, y_line), (x1, y_line), (0, 0, 0), thickness=line_thickness) #"paints" a black line in the middle
 
-    return img
+return img
 ```
 
-Po celé pipeline se ještě musí očíslovat dané kontoury buněk. Celá pipeline a její výsledek pak vypadají takto:
+The cell contours must still be numbered throughout the pipeline. The entire pipeline and its result then look like this:
 ```python
 def apply_pipeline(self, pipeline_number: int, contour_rect_size:int, binarization_method:int, contour_bin_cell_size:int=150):
-        fun = getattr(pipelines, f'pipeline{pipeline_number}')# vzhledej pipeline podle jména funkce
-        self.edited = fun(self.original) # spusť pipeline na vstupním obrázu; výsledek ulož do upraveného obrázku
-        self.extract_rects_current(contour_rect_size,10) #pomocí obdélníkových kontour najdi "buňky"
-        self.last_rois_binary.clear() 
-        for i in range(len(self.last_rois) - 1, -1, -1):#pro každou najitou buňku...
-            roi = self.last_rois[i]
-            fun_bin = getattr(pipelines, f'roi_binarization{binarization_method}')
-            binarized_roi = fun_bin(roi) #...spusť binarizaci buňky
-            binarized_roi = split_middle_cell(binarized_roi) #...rozděl prostřední buňku
-            contours = self.find_contours(binarized_roi, contour_bin_cell_size) #..pomocí kontour najdi "jádra buňky"
-             #odstraň vše, co není v konturách
-            mask = np.zeros(binarized_roi.shape[:2], dtype=np.uint8)
-            cv.drawContours(mask, contours, -1, 1, thickness=cv.FILLED)
-            binarized_roi[mask == 0] = 0
-            if not (len(contours)==11): #pokud je buňka vadná, tj. neobsahuje 11 jader, vymaž ji
-                self.last_rois.pop(i)
-                continue
-            counting = 0
-            for c in contours:
-                # očíseluj jádra a do pravého horního rohu napiš celkový počet jader
-                x, y, bw, bh = cv.boundingRect(c)
-                h, w = binarized_roi.shape[:2]
+fun = getattr(pipelines, f'pipeline{pipeline_number}')# look up the pipeline by function name
+self.edited = fun(self.original) # run the pipeline on the input image; save the result to the edited image
+self.extract_rects_current(contour_rect_size,10) #find "cells" using rectangular contours
+self.last_rois_binary.clear()
+for i in range(len(self.last_rois) - 1, -1, -1):#for each cell found...
+roi = self.last_rois[i]
+fun_bin = getattr(pipelines, f'roi_binarization{binarization_method}')
+binarized_roi = fun_bin(roi) #...run cell binarization
+binarized_roi = split_middle_cell(binarized_roi) #...split the middle cell
+contours = self.find_contours(binarized_roi, contour_bin_cell_size) #..find "cell nuclei" using contours
+#remove everything that is not in the contours
+mask = np.zeros(binarized_roi.shape[:2], dtype=np.uint8)
+cv.drawContours(mask, contours, -1, 1, thickness=cv.FILLED)
+binarized_roi[mask == 0] = 0
+if not (len(contours)==11): #if the cell is defective, i.e. does not contain 11 nuclei, delete it
+self.last_rois.pop(i)
+continue
+counting = 0
+for c in contours:
+# number the nuclei and write the total number of nuclei in the upper right corner
+x, y, bw, bh = cv.boundingRect(c)
+h, w = binarized_roi.shape[:2]
 
-                x0 = max(0, x)
-                y0 = max(0, y)
-                x1 = min(w - 1, x + bw)
-                y1 = min(h - 1, y + bh)
+x0 = max(0, x)
+y0 = max(0, y)
+x1 = min(w - 1, x + bw)
+y1 = min(h - 1, y + bh)
 
-                cx = int(x0 + (x1 - x0) / 2)
-                cy = int(y0 + (y1 - y0) / 2)
-                
-                counting +=1
+cx = int(x0 + (x1 - x0) / 2)
+cy = int(y0 + (y1 - y0) / 2)
 
-                cv.putText(binarized_roi, str(counting), (cx, cy), cv.FONT_HERSHEY_PLAIN,0.5, 0,1)
-            cv.putText(binarized_roi, str(counting), (5, 5), cv.FONT_HERSHEY_PLAIN,0.5, 1,1)
-            self.last_rois_binary.append(binarized_roi)
-        self.save_rects_current() #otevře dialog pro vybrání cílového adresáře a uloží tam output (binarizované a grey-scale obrázky  = dataset)
+counting +=1
+cv.putText(binarized_roi, str(counting), (cx, cy), cv.FONT_HERSHEY_PLAIN,0.5, 0,1)
+cv.putText(binarized_roi, str(counting), (5, 5), cv.FONT_HERSHEY_PLAIN,0.5, 1,1)
+self.last_rois_binary.append(binarized_roi)
+self.save_rects_current() #opens a dialog for selecting a target directory and saves the output there (binarized and grey-scale images = dataset)
 ```
 
 ![binary_roi_006.png](Segmentation%20using%20traditional%20methods/pics/pipeline_1/img1/binary_roi_006.png)
 
-### Přehled naimplementovaných operací
-Základní **jednoobrázkové (monadické)** operace – mění vlastnosti jasu, kontrastu a intenzity pixelů.
+### Overview of implemented operations
+Basic **single-image (monadic)** operations – change the brightness, contrast and intensity properties of pixels.
 
-| Metoda | Popis | Využití |
+| Method | Description | Usage |
+|--------|--------|------|
+| **`negate(img)`** | Inverts the image (swaps light and dark areas). | Edge enhancement |
+| **`adjust_gamma(img, gamma)`** | Performs gamma correction — adjusts the brightness of the image nonlinearly. | Compensates for differences in lighting, brightening or darkening images. |
+| **`adjust_brightness(img, brightness)`** | Linearly adds or subtracts brightness. | Corrects underexposed or overexposed images. |
+| **`adjust_contrast(img, contrast)`** | Changes contrast by multiplying pixel values. | Enhances details, improves sharpness. |
+| **`non_linear_contrast(img, alpha)`** | Nonlinear contrast adjustment using a transition between highlights and shadows. | More natural contrast improvement than the linear method. |
+| **`logarithmic_scale(img, s)`** | Logarithmic brightness transformation. | Enhance details in dark areas. |
+| **`quantization(img, q)`** | Reduce the number of brightness levels (quantization). | Image size reduction, stylization, preprocessing for classification. |
+
+---
+Collection of **filtering and edge methods** – used to remove noise, blur or highlight structures.
+
+| Method | Description | Usage |
 |--------|--------|----------|
-| **`negate(img)`** | Inverzuje obraz (vymění světlé a tmavé oblasti). | Zvýraznění hran |
-| **`adjust_gamma(img, gamma)`** | Provádí korekci gama — upravuje jas obrazu nelineárně. | Kompenzace rozdílů v osvětlení, zjasnění nebo ztmavení snímků. |
-| **`adjust_brightness(img, brightness)`** | Lineárně přidává nebo ubírá jas. | Korekce podexponovaných nebo přeexponovaných obrazů. |
-| **`adjust_contrast(img, contrast)`** | Mění kontrast vynásobením pixelových hodnot. | Zvýraznění detailů, zlepšení ostrosti. |
-| **`non_linear_contrast(img, alpha)`** | Nelineární úprava kontrastu pomocí přechodu mezi světly a stíny. | Přirozenější zlepšení kontrastu než lineární metoda. |
-| **`logarithmic_scale(img, s)`** | Logaritmická transformace jasu. | Zvýraznění detailů ve tmavých oblastech. |
-| **`quantization(img, q)`** | Snížení počtu úrovní jasu (kvantizace). | Zmenšení velikosti obrazu, stylizace, předzpracování pro klasifikaci. |
+| **`mean_blur(img, ksize)`** | Averaging filter. | Noise reduction, image smoothing. |
+| **`gaussian_blur(img, ksize, sigma)`** | Gaussian blur. | Noise suppression, detail removal before segmentation. |
+| **`median_filter(img, ksize)`** | Median filter. | Remove impulse noise ("salt & pepper") without blurring edges. |
+| **`bilateral_filter(img, d, sigma_color, sigma_space)`** | Bilateral filter - preserves edges when smoothing. | Reduce noise while preserving cell or object contours. |
+| **`canny(img, threshold1, _, threshold2)`** | Canny edge detector. | Detect edges and shapes of cells, objects or structures. |
+| **`diff_of_gauss(img, sigma, k)`** | Difference of two Gaussians (DoG). | Edge enhancement similar to Laplace, often used in biological processing. |
+| **`laplacian_of_gauss(img, sigma, ksize_lap)`** | Laplace filter after Gaussian blur (LoG). | Detect edges and intensity transitions with less noise. |
+---
+Advanced **morphological and segmentation** methods – useful for analyzing cells, objects and shapes.
+
+| Method | Description | Usage |
+|-------------------------------------------|----------------------------------------------------------|--------------------------------------------------------------|
+| **`hist_equalization(img)`** | Histogram normalization – equalizes brightness and contrast. | Improves visibility of details. |
+| **`clahe(img, clip_limit, tile_grid)`** | Adaptive histogram equalization. | Contrast equalization for inhomogeneously illuminated images. |
+| **`erosion(img, size)`** | Erosion – reduces bright areas. | Removes small noise or separates nearby objects. |
+| **`dilatation(img, size)`** | Dilation – expands bright areas. | Fills gaps, highlights structures. |
+| **`opening(img, size)`** | Opening (erosion + dilation). | Remove small noise points while preserving shapes. |
+| **`closing(img, size)`** | Closing (dilation + erosion). | Smooth edges, remove small dark holes. |
+| **`otsu(img)`** | Otsu's algorithm for automatic threshold segmentation. | Automatic image division into background and objects. |
+| **`find_contours(img, min_area)`** | Find object outlines. | Extract cell or particle shapes. |
+| **`save_rect_images(rect_imgs, out_dir)`** | Save cropped areas as separate images. | Export individual objects for dataset. |
+| **`split_middle_cell(img)`** | Find and split the central cell with a line. | ​​Help with separating connected cells. |
+| **`image_reconstruct(marker, img)`** | Morphological reconstruction. | Recovering objects from damaged or partially deleted data. |
 
 ---
-Kolekce **filtračních a hranových metod** – slouží k odstranění šumu, rozostření nebo zvýraznění struktur.
+## Results
+The following table describes how my project turned out.
 
-| Metoda | Popis | Využití |
-|--------|--------|----------|
-| **`mean_blur(img, ksize)`** | Průměrovací filtr. | Zmírnění šumu, vyhlazení obrazu. |
-| **`gaussian_blur(img, ksize, sigma)`** | Gaussovské rozostření. | Potlačení šumu, odstranění detailů před segmentací. |
-| **`median_filter(img, ksize)`** | Mediánový filtr. | Odstranění impulsního („salt & pepper“) šumu bez rozmazání hran. |
-| **`bilateral_filter(img, d, sigma_color, sigma_space)`** | Bilaterální filtr – zachovává hrany při vyhlazování. | Redukce šumu při zachování kontur buněk nebo objektů. |
-| **`canny(img, threshold1, _, threshold2)`** | Canny detektor hran. | Detekce hran a tvarů buněk, objektů nebo struktur. |
-| **`diff_of_gaus(img, sigma, k)`** | Rozdíl dvou Gaussů (DoG). | Zvýraznění hran podobně jako Laplace, často v biologickém zpracování. |
-| **`laplacian_of_gaus(img, sigma, ksize_lap)`** | Laplace filtr po Gaussovském rozostření (LoG). | Detekce hran a přechodů intenzity s menším šumem. |
-
----
-Pokročilé **morfologické a segmentační** metody – užitečné pro analýzu buněk, objektů a tvarů.
-
-| Metoda                                     | Popis                                                   | Využití                                                     |
-|--------------------------------------------|---------------------------------------------------------|-------------------------------------------------------------|
-| **`hist_equalization(img)`**               | Normalizace histogramu – vyrovná jas a kontrast.        | Zlepšení viditelnosti detailů.                              |
-| **`clahe(img, clip_limit, tile_grid)`**    | Adaptivní ekvalizace histogramu.                        | Vyrovnání kontrastu u nehomogenně osvětlených snímků.       |
-| **`erosion(img, size)`**                   | Eroze – zmenší světlé oblasti.                          | Odstranění drobných šumů nebo oddělení blízkých objektů.    |
-| **`dilatation(img, size)`**                | Dilatace – rozšíří světlé oblasti.                      | Vyplnění mezer, zvýraznění struktur.                        |
-| **`opening(img, size)`**                   | Otevření (eroze + dilatace).                            | Odstranění malých šumových bodů při zachování tvarů.        |
-| **`closing(img, size)`**                   | Uzavření (dilatace + eroze).                            | Vyhlazení hran, odstranění malých tmavých děr.              |
-| **`otsu(img)`**                            | Otsuův algoritmus pro automatickou prahovou segmentaci. | Automatické rozdělení obrazu na pozadí a objekty.           |
-| **`find_contours(img, min_area)`**         | Najde obrysy (kontury) objektů.                         | Extrakce tvarů buněk nebo částic.                           |
-| **`save_rect_images(rect_imgs, out_dir)`** | Uloží oříznuté oblasti jako samostatné snímky.          | Export jednotlivých objektů pro dataset.                    |
-| **`split_middle_cell(img)`**               | Najde a rozdělí centrální buňku čarou.                  | Pomoc při separaci spojených buněk.                         |
-| **`image_reconstruct(marker, img)`**       | Morfologická rekonstrukce.                              | Obnovení objektů z poškozených nebo částečně smazaných dat. |
-
----
-## Výsledky
-V následujicí tabulce popisuji, jak ve výsledku dopadl můj projekt.
-
-| Název obrázku     | Počet "buněk" | Počet vadných buněk | Procento vadných | Konečný počet buněk |
-|-------------------|---------------|---------------------|------------------|---------------------|
-| PCD1.tiff         | 69            | 3                   | 4.34%            | 66                  |
-| PCD2.tiff         | 18            | 7                   | 38.88%           | 11                  |
-| PCD3.tiff         | 50            | 2                   | 4.00%            | 48                  |
-| Tv8.tiff          | 18            | 0                   | 0.00%            | 18                  |
-| Tv11.tiff         | 66            | 5                   | 8.12%            | 61                  |
-| Tv17.tiff         | 24            | 3                   | 12.50%           | 21                  |
-| Tv21.tiff         | 29            | 1                   | 3.44%            | 28                  |
-| Tv31.tiff         | 30            | 5                   | 16.66%           | 25                  |
-| Tv33.tiff         | 37            | 0                   | 0.00%            | 37                  |
-| **SOUČET/PRŮMĚR** | **341**       | **26**              | **7.63%**        | **315**             |
-
-
+| Image name | Number of "cells" | Number of defective cells | Percentage of defective | Final number of cells |
+|-------------------|--------------|-------------------|-------------------|-------------------|
+| PCD1.tiff | 69 | 3 | 4.34% | 66 |
+| PCD2.tiff | 18 | 7 | 38.88% | 11 |
+| PCD3.tiff | 50 | 2 | 4.00% | 48 |
+| Tv8.tiff | 18 | 0 | 0.00% | 18 |
+| Tv11.tiff | 66 | 5 | 8.12% | 61 |
+| Tv17.tiff | 24 | 3 | 12.50% | 21 |
+| Tv21.tiff | 29 | 1 | 3.44% | 28 |
+| Tv31.tiff | 30 | 5 | 16.66% | 25 |
+| Tv33.tiff | 37 | 0 | 0.00% | 37 |
+| **SUM/AVERAGE** | **341** | **26** | **7.63%** | **315** |
 
 # CNN implementation
 
-Cílem tohoto úkolu bylo využít dataset z prvního úkolu a natrénovat na něm síť U-Net.
+The goal of this task was to use the dataset from the first task and train a U-Net on it.
 
 ![test_00006.png](CNN%20implementation/out/test_predictions_25-11-04_14-14-44/test_preds/test_00006.png)
 
 ## Part 1: Dataset Preparation
 
-Dataset se skládal ze zkruba 300 obrázků z prvního úkolu,
-přičemž došlo ke změně, a to sice že se odstranila černá úsečka rozdělující prostřední tobuli cílie.
-Dataset byl rozdělen na originální obrázky cílií a jejich černobílé masky.
+The dataset consisted of about 300 images from the first task,
+with the change that the black line dividing the middle ciliary tobule was removed.
 
-Originální bitmapové obrázky byly načteny jako grey-scale a zvětšeny na rozlišení 256x256 pixelů pomocí bilineární interpolace.
-Stejně byly načteny i masky, které ovšem byly zvětšeny pomocí interpolace nejbližího souseda, což v tomto případě šlo pro vést relativně bezproblémově, neboť se jedná o černobílé obrázky.
+The dataset was divided into the original cilia images and their black-and-white masks.
 
-Pro zvětšení velikosti vstupního datasetu byla použita augmentace v podobě rotace obrázů o 90°, 180° a 270°. Díky takto zvoleným rotacím se nemuselo řešit, co se stane s prázným místem, kdybychom obrázek otočili o např. 45°. Také bylo zjištěno, že při zvýšení počtu rotací (např. kdybychom rotovali obrázek o 15°), tak by trénování sítě zabralo příliš mnoho času (za předpokladu, že bychom nenastavili počet epoch na nějaký nízký počet).
+The original bitmap images were loaded as grey-scale and enlarged to a resolution of 256x256 pixels using bilinear interpolation.
 
+The masks were loaded in the same way, but enlarged using nearest neighbor interpolation, which in this case was relatively easy to implement, since these are black-and-white images.
+
+To increase the size of the input dataset, augmentation was used in the form of rotating the images by 90°, 180° and 270°. Thanks to the rotations chosen in this way, we did not have to deal with what would happen to the empty space if we rotated the image by, for example, 45°. It was also found that increasing the number of rotations (e.g., if we rotated the image by 15°), training the network would take too much time (assuming we did not set the number of epochs to some low number).
 ## Part 2: U-Net Architecture
 
-U-Net je realizován v pětivrstvé architektuře (5 downsample bloků následovaných bottleneckem a 5 upsample bloky). Počet konvolučních filtrů na vstupní vrstvě je 16; v každém dalším stupni encoderu se počet filtrů zdvojnásobuje (tzn. 16, 32, 64, 128, 256). Zvhledem k tomu, že obrázek je na vstupu 256x256, tak se po poolováních v enkóderu dostane na 16x16.
-Decoder je symetrický k encoderu a v jednotlivých úrovních postupně snižuje počet kanálů zpět na 16, přičemž využívá skip connection spojující odpovídající vrstvy.
+U-Net is implemented in a five-layer architecture (5 downsample blocks followed by a bottleneck and 5 upsample blocks). The number of convolutional filters on the input layer is 16; in each subsequent encoder stage, the number of filters doubles (i.e. 16, 32, 64, 128, 256). Given that the image is 256x256 at the input, after pooling in the encoder it gets to 16x16.
 
-Při implementaci výsledného řešení byly otestovány i některé úpravy, které ovšem nefungovaly dostatečně efektivně a proto nebyly použity. Mezi těmito úpravami bylo: 1） snížení počtu vrstev na 2, to způsobilo, že síť označovala některé části jako false positive.
+The decoder is symmetric to the encoder and in each level it gradually reduces the number of channels back to 16, using skip connections connecting the corresponding layers.
+
+When implementing the resulting solution, some modifications were tested, but they did not work effectively enough and therefore were not used. Among these modifications were: 1） reducing the number of layers to 2, which caused the network to mark some parts as false positives.
 
 ![test_00005fp.png](CNN%20implementation/out/test_predictions_25-11-04_07-12-49/test_preds/test_00005.png)
 
-2） Počet konvolučních filtrů na vstupní vrstvě byl nastaven na 32. Toto vedlo ke zvýšení výpočetní složitosti při trénování, aniž by se dostavily nějaké změny na efektivnosti výsledné sítě. Proto se zvolilo počátečních 16.
+2） The number of convolutional filters on the input layer was set to 32. This led to an increase in the computational complexity during training without any changes in the efficiency of the resulting network. Therefore, the initial 16 was chosen.
 
 ## Part 3: Model Training
 
-Trénování modelu využívalo vytvořenou U-Netu, rozdělení datasetu na tři části, kombinaci dvou loss funkcí a early-stopping.
+The model training used the created U-Net, dividing the dataset into three parts, a combination of two loss functions and early-stopping.
 
-### Rozdělení datasetu
+### Dataset division
 
-Dataset se rozdělil na tři části: trénovací, validační a testovací. Poměr těchto skupin by 70/15/15. Tento počet byl zvolen vzhledem k velikosti datasetu, jeho augmentaci a také protože to bylo zmíněno na přednášce.
+The dataset was divided into three parts: training, validation and testing. The ratio of these groups was 70/15/15. This number was chosen due to the size of the dataset, its augmentation and also because it was mentioned in the lecture.
 
 ```python
 train_size = int(0.7 * len(ds)) # 70%
-val_size   = int(0.15 * len(ds)) # 15%
-test_size  = len(ds) - train_size - val_size # 100-70-15 = 15%
+val_size = int(0.15 * len(ds)) # 15%
+test_size = len(ds) - train_size - val_size # 100-70-15 = 15%
 ```
 
 ### Batch size
 
-Při trénování byl také zvolen batch size 8 primárně kvůli mé velikosti paměti, každopádně podle mého neformálního výzkumu, by zvýšení batch size na 16 či 32 nemělo výrazný efekt.
+During training, a batch size of 8 was also chosen primarily because of my memory size, however, according to my informal research, increasing the batch size to 16 or 32 would not have a significant effect.
 
-### Ztrátová funkce
+### Loss function
 
-Při trénování modelu byly vyzkoušeny dvě loss funkce, a to sice dice loss, binary cross-entropy loss a následně i jejich kombinace. Tato kombinace využívala obou funkcí zároveň, přičemž jejich poměr byl určován hodnotou alpha, která určovala "váhu" BCE. Např. pokud alpha=0.8, tak BCE mělo váhu 80% a dice pouze 20%; pokud by alpha=0.5, funkce by měly stejnou váhu.
+During training the model, two loss functions were tested, namely dice loss, binary cross-entropy loss and subsequently their combination. This combination used both functions at the same time, with their ratio being determined by the alpha value, which determined the "weight" of BCE. For example, if alpha=0.8, BCE had a weight of 80% and dice only 20%; if alpha=0.5, the features would have the same weight.
 
-Nakonec se nejvíce osvědčilo použít buď BCE nebo dice; jejich kombinace měla úspěch pouze pokud byla alpha velmi nízká.
+In the end, it worked best to use either BCE or dice; their combination was successful only if alpha was very low.
 
-### Early stop a počet epoch
+### Early stop and number of epochs
 
-Počet epoch a early-stop spolu úzce souvisí, proto je popíši v rámci jedné podkapitoly.
+The number of epochs and early-stop are closely related, so I will describe them in one subsection.
 
-Počet epoch byl nastaven na 120, ovšem kvůli early-stop algoritmu se trénovací algoritmus dostal nejvýše na 30.
+The number of epochs was set to 120, but due to the early-stop algorithm, the training algorithm reached a maximum of 30.
 
-Early-stop algoritmus po každé epoše zkontroluje validation loss; pokud se "zlepšila", tak algoritmus pokračuje dále, pokud se 5krát po sobě nezlepšila, trénování končí a dojde k obnovení nejlepší validační ztráty.
-Za zlepšení se považuje následující přepis: `val_loss < best_val_loss - 1e-5`
+The early-stop algorithm checks the validation loss after each epoch; if it has "improved", the algorithm continues, if it has not improved 5 times in a row, the training ends and the best validation loss is restored.
+The following transcription is considered an improvement: `val_loss < best_val_loss - 1e-5`
 
 ### Visualizations of the process
 
-V této podkapitole lze najít grafy různých metrik, které byly měřeny během trénovaní sítě s různými parametry. Mezi těmito paramatry většinou najdeme ztrátovou funkci, neboť early-stop a počet vrtev sítě byl nastaven staticky a k jeho změnám nedocházelo často.
+In this subsection, you can find graphs of various metrics that were measured during training the network with different parameters. Among these parameters we usually find the loss function, since the early-stop and the number of network slots were set statically and its changes did not occur often.
 
-Při zvolení ztrátové funkce BCE+Dice s váhou na BCE 0.9, trénování skončilo relativně rychle (po 12 epochách), ale hodnoty ztát dobré nebyly, viz. obrázek níže.
+When choosing the BCE+Dice loss function with a BCE weight of 0.9, training ended relatively quickly (after 12 epochs), but the loss values ​​were not good, see the figure below.
 
 ![bcedice09.png](CNN%20implementation/out/test_predictions_25-11-06_08-50-55_bce09/loss_curves.png)
 ![bcedice09.png](CNN%20implementation/out/test_predictions_25-11-06_08-50-55_bce09/dice_curve.png)
 
-Opakem bylo zvolení BCE s 0.1, což způsobilo, že se síť trénovala 59 epoch než narazila na early-stop, ovšem její výsledky byly v porovnání s předchozím pokusem přívětivější.
+The opposite was choosing BCE with 0.1, which caused the network to train for 59 epochs before hitting an early-stop, but its results were more favorable compared to the previous attempt.
 
 ![bcedice01.png](CNN%20implementation/out/test_predictions_25-11-06_09-05-23/loss_curves.png)
 ![bcedice01.png](CNN%20implementation/out/test_predictions_25-11-06_09-05-23/dice_curve.png)
 
-Při zvolení BCE 0.5 (tj, obě ztrátové funkce měly stejnou váhu), tak výsledek byl opět lepší. Dosáhlo se toho, že se síť trénovala +-30 epoch se ztrátou < 0.1
+When choosing BCE 0.5 (i.e., both loss functions had the same weight), the result was again better. It was achieved that the network was trained for +-30 epochs with a loss < 0.1
 
-Při zvolení pouze BCE ztrátové funkce, se dosáhlo nejlepších výsledků v porovnání s ostaními pokusy. Počet epoch byl pouze 32, přičemž ztráty a dice vykazovaly lepší hodnoty než předešlé pokusy.
+When choosing only the BCE loss function, the best results were achieved compared to the other attempts. The number of epochs was only 32, with losses and dice showing better values ​​than previous attempts.
 
 ![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/loss_curves.png)
 ![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/dice_curve.png)
@@ -346,13 +338,13 @@ Při zvolení pouze BCE ztrátové funkce, se dosáhlo nejlepších výsledků v
 
 ### Qualitative
 
-Kvalitativní evaluace modelu se provádí relativně těžce, protože výsledky se ukazují být lepší než ground truth. Toto je způsobeno, že v prvním úkolu se na tobule použila morfologická operace opening s obdélníkovým kernelem; výsledky sítě nejsou tedy tolik hranaté a působí "lépe".
+Qualitative evaluation of the model is relatively difficult, because the results turn out to be better than the ground truth. This is because in the first task the morphological operation opening with a rectangular kernel was used on the tobula; therefore the network results are not so square and look "better".
 
-Zvolená síť nakonec nenesla významné kvantitativní výkyvy. Tyto výkyvy (např. false positive) byly popsány v předchozích kapitolách, a byly způsobeny "mělkou" sítí nebo špatnou kombinací ztrátové funkce.
+The chosen network did not ultimately suffer from significant quantitative fluctuations. These fluctuations (e.g. false positives) were described in previous chapters, and were caused by a "shallow" network or a bad combination of loss functions.
 
 ### Quantitative
 
-V této kapitole jsou zobrazeny kvantitativní evaluace nejlepší sítě.
+In this chapter, quantitative evaluations of the best network are shown.
 
 ![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/prf1_curves.png)
 
@@ -367,29 +359,29 @@ V této kapitole jsou zobrazeny kvantitativní evaluace nejlepší sítě.
 
 ## Part 5: Hyperparameter Tuning
 
-V projektu jsem použil U-Net, což je konvoluční encoder–decoder architektura pro segmentaci obrazu. Síť se skládá ze dvou částí:
+In the project I used U-Net, which is a convolutional encoder–decoder architecture for image segmentation. The network consists of two parts:
 
-- encoder (downsampling): postupně zmenšuje rozlišení a zvyšuje počet filtrů, čímž extrahuje abstraktnější rysy z obrazu,
+- encoder (downsampling): gradually reduces the resolution and increases the number of filters, thus extracting more abstract features from the image,
 
-- decoder (upsampling): obnovuje prostorové rozlišení, přičemž využívá skip-connections z encoderu, takže kombinujeme nízkoúrovňové detaily s vysokoúrovňovou semantikou.
+- decoder (upsampling): restores spatial resolution, using skip-connections from the encoder, so we combine low-level details with high-level semantics.
 
-Každá úroveň obsahuje 2× konvoluci 3×3 a aktivaci ReLU. Mezi úrovněmi se používá MaxPooling (2×2) pro zmenšení rozlišení a transposed convolution (2×2) pro zvětšení rozlišení v decoderu. Výstupní vrstva je 1×1 konvoluce, která produkuje mapu logitů (1 kanál), vhodnou pro binární segmentaci pomocí BCEWithLogitsLoss.
+Each level contains 2× 3×3 convolutions and ReLU activations. Between levels, MaxPooling (2×2) is used to reduce the resolution and transposed convolution (2×2) is used to increase the resolution in the decoder. The output layer is a 1×1 convolution that produces a logit map (1 channel), suitable for binary segmentation using BCEWithLogitsLoss.
 
-Při použítí U-Net s 2 vrstvami došlo ke zvýšení počtu pixelů jako false positive; při použítí 10 vrstev byl trénink zbytečně dlouhý.
+When using a U-Net with 2 layers, the number of pixels as false positives increased; when using 10 layers, the training was unnecessarily long.
 
-Jako nejlepší vyšla varianta pěti úrovní:
+The five-level variant came out as the best:
 
-- poskytuje dostatečnou reprezentaci i pro jemné detaily,
+- provides sufficient representation even for fine details,
 
-- nemá tak velký počet parametrů, aby se přetrénovala,
+- does not have such a large number of parameters that it overtrains,
 
-- má nejlepší poměr výkon / doba tréninku / paměť,
+- has the best performance / training time / memory ratio,
 
-- stabilní trénování a nejvyšší validační Dice a IoU.
+- stable training and the highest validation Dice and IoU.
 
-Average pooling měl problém se zachováním hran a textur; max pooling v tomto vyšel jako lepší možnost.
+Average pooling had a problem with preserving edges and textures; max pooling came out as a better option in this regard.
 
-## Ukázky výsledků
+## Sample results
 
 ![vysledek](./out/test_predictions_25-11-06_10-23-06/test_preds/test_00076.png)
 
@@ -403,84 +395,84 @@ Average pooling měl problém se zachováním hran a textur; max pooling v tomto
 
 
 
-# Assingment 02
+# Assignment 02
 
-Cílem tohoto úkolu bylo využít dataset z prvního úkolu a natrénovat na něm síť U-Net.
+The goal of this assignment was to use the dataset from the first assignment and train the U-Net on it.
 
 ![test_00006.png](CNN%20implementation/out/test_predictions_25-11-04_14-14-44/test_preds/test_00006.png)
 
 ## Part 1: Dataset Preparation
 
-Dataset se skládal ze zkruba 300 obrázků z prvního úkolu,
-přičemž došlo ke změně, a to sice že se odstranila černá úsečka rozdělující prostřední tobuli cílie.
-Dataset byl rozdělen na originální obrázky cílií a jejich černobílé masky.
+The dataset consisted of about 300 images from the first assignment,
+with the change that the black line dividing the middle ciliary tobule was removed.
 
-Originální bitmapové obrázky byly načteny jako grey-scale a zvětšeny na rozlišení 256x256 pixelů pomocí bilineární interpolace.
-Stejně byly načteny i masky, které ovšem byly zvětšeny pomocí interpolace nejbližího souseda, což v tomto případě šlo pro vést relativně bezproblémově, neboť se jedná o černobílé obrázky.
+The dataset was divided into the original cilia images and their black and white masks.
 
-Pro zvětšení velikosti vstupního datasetu byla použita augmentace v podobě rotace obrázů o 90°, 180° a 270°. Díky takto zvoleným rotacím se nemuselo řešit, co se stane s prázným místem, kdybychom obrázek otočili o např. 45°. Také bylo zjištěno, že při zvýšení počtu rotací (např. kdybychom rotovali obrázek o 15°), tak by trénování sítě zabralo příliš mnoho času (za předpokladu, že bychom nenastavili počet epoch na nějaký nízký počet).
+The original bitmap images were loaded as grey-scale and enlarged to a resolution of 256x256 pixels using bilinear interpolation.
+The masks were also loaded in the same way, but they were enlarged using nearest neighbor interpolation, which in this case was relatively easy to do, since these are black and white images.
+
+To increase the size of the input dataset, augmentation was used in the form of rotating the images by 90°, 180° and 270°. Thanks to the rotations chosen in this way, we did not have to consider what would happen to the empty space if we rotated the image by, for example, 45°. It was also found that if we increased the number of rotations (e.g. if we rotated the image by 15°), training the network would take too much time (assuming we did not set the number of epochs to a low number).
 
 ## Part 2: U-Net Architecture
 
-U-Net je realizován v pětivrstvé architektuře (5 downsample bloků následovaných bottleneckem a 5 upsample bloky). Počet konvolučních filtrů na vstupní vrstvě je 16; v každém dalším stupni encoderu se počet filtrů zdvojnásobuje (tzn. 16, 32, 64, 128, 256). Zvhledem k tomu, že obrázek je na vstupu 256x256, tak se po poolováních v enkóderu dostane na 16x16.
-Decoder je symetrický k encoderu a v jednotlivých úrovních postupně snižuje počet kanálů zpět na 16, přičemž využívá skip connection spojující odpovídající vrstvy.
+U-Net is implemented in a five-layer architecture (5 downsample blocks followed by a bottleneck and 5 upsample blocks). The number of convolutional filters on the input layer is 16; at each subsequent stage of the encoder, the number of filters doubles (i.e. 16, 32, 64, 128, 256). Given that the image is 256x256 at the input, after pooling in the encoder it reaches 16x16.
+The decoder is symmetrical to the encoder and in each level it gradually reduces the number of channels back to 16, using skip connections connecting the corresponding layers.
 
-Při implementaci výsledného řešení byly otestovány i některé úpravy, které ovšem nefungovaly dostatečně efektivně a proto nebyly použity. Mezi těmito úpravami bylo: 1） snížení počtu vrstev na 2, to způsobilo, že síť označovala některé části jako false positive.
+When implementing the resulting solution, some modifications were tested, but they did not work effectively enough and therefore were not used. Among these modifications were: 1） reducing the number of layers to 2, this caused the network to mark some parts as false positives.
 
 ![test_00005fp.png](CNN%20implementation/out/test_predictions_25-11-04_07-12-49/test_preds/test_00005.png)
 
-2） Počet konvolučních filtrů na vstupní vrstvě byl nastaven na 32. Toto vedlo ke zvýšení výpočetní složitosti při trénování, aniž by se dostavily nějaké změny na efektivnosti výsledné sítě. Proto se zvolilo počátečních 16.
+2） The number of convolutional filters on the input layer was set to 32. This led to an increase in the computational complexity during training without any changes in the efficiency of the resulting network. Therefore, the initial 16 was chosen.
 
 ## Part 3: Model Training
 
-Trénování modelu využívalo vytvořenou U-Netu, rozdělení datasetu na tři části, kombinaci dvou loss funkcí a early-stopping.
+The model training used the created U-Net, dividing the dataset into three parts, a combination of two loss functions and early-stopping.
 
-### Rozdělení datasetu
+### Dataset division
 
-Dataset se rozdělil na tři části: trénovací, validační a testovací. Poměr těchto skupin by 70/15/15. Tento počet byl zvolen vzhledem k velikosti datasetu, jeho augmentaci a také protože to bylo zmíněno na přednášce.
+The dataset was divided into three parts: training, validation and testing. The ratio of these groups was 70/15/15. This number was chosen due to the size of the dataset, its augmentation and also because it was mentioned in the lecture.
 
 ```python
 train_size = int(0.7 * len(ds)) # 70%
-val_size   = int(0.15 * len(ds)) # 15%
-test_size  = len(ds) - train_size - val_size # 100-70-15 = 15%
+val_size = int(0.15 * len(ds)) # 15%
+test_size = len(ds) - train_size - val_size # 100-70-15 = 15%
 ```
 
 ### Batch size
 
-Při trénování byl také zvolen batch size 8 primárně kvůli mé velikosti paměti, každopádně podle mého neformálního výzkumu, by zvýšení batch size na 16 či 32 nemělo výrazný efekt.
+A batch size of 8 was also chosen for training primarily due to my memory size, however, according to my informal research, increasing the batch size to 16 or 32 would not have a significant effect.
+### Loss function
 
-### Ztrátová funkce
+Two loss functions were tested when training the model, namely dice loss, binary cross-entropy loss and subsequently their combination. This combination used both functions at the same time, with their ratio being determined by the alpha value, which determined the "weight" of BCE. For example, if alpha=0.8, BCE had a weight of 80% and dice only 20%; if alpha=0.5, the functions would have the same weight.
 
-Při trénování modelu byly vyzkoušeny dvě loss funkce, a to sice dice loss, binary cross-entropy loss a následně i jejich kombinace. Tato kombinace využívala obou funkcí zároveň, přičemž jejich poměr byl určován hodnotou alpha, která určovala "váhu" BCE. Např. pokud alpha=0.8, tak BCE mělo váhu 80% a dice pouze 20%; pokud by alpha=0.5, funkce by měly stejnou váhu.
+In the end, it worked best to use either BCE or dice; their combination was successful only if alpha was very low.
 
-Nakonec se nejvíce osvědčilo použít buď BCE nebo dice; jejich kombinace měla úspěch pouze pokud byla alpha velmi nízká.
+### Early stop and number of epochs
 
-### Early stop a počet epoch
+The number of epochs and early-stop are closely related, so I will describe them in one subsection.
 
-Počet epoch a early-stop spolu úzce souvisí, proto je popíši v rámci jedné podkapitoly.
+The number of epochs was set to 120, but due to the early-stop algorithm, the training algorithm reached a maximum of 30.
 
-Počet epoch byl nastaven na 120, ovšem kvůli early-stop algoritmu se trénovací algoritmus dostal nejvýše na 30.
-
-Early-stop algoritmus po každé epoše zkontroluje validation loss; pokud se "zlepšila", tak algoritmus pokračuje dále, pokud se 5krát po sobě nezlepšila, trénování končí a dojde k obnovení nejlepší validační ztráty.
-Za zlepšení se považuje následující přepis: `val_loss < best_val_loss - 1e-5`
+The early-stop algorithm checks the validation loss after each epoch; if it "improved", the algorithm continues, if it did not improve 5 times in a row, the training ends and the best validation loss is restored.
+The following transcription is considered an improvement: `val_loss < best_val_loss - 1e-5`
 
 ### Visualizations of the process
 
-V této podkapitole lze najít grafy různých metrik, které byly měřeny během trénovaní sítě s různými parametry. Mezi těmito paramatry většinou najdeme ztrátovou funkci, neboť early-stop a počet vrtev sítě byl nastaven staticky a k jeho změnám nedocházelo často.
+In this subsection, you can find graphs of various metrics that were measured during network training with different parameters. Among these parameters, we usually find the loss function, since the early-stop and the number of network slots were set statically and its changes did not occur often.
 
-Při zvolení ztrátové funkce BCE+Dice s váhou na BCE 0.9, trénování skončilo relativně rychle (po 12 epochách), ale hodnoty ztát dobré nebyly, viz. obrázek níže.
+When choosing the BCE+Dice loss function with a weight of BCE 0.9, the training ended relatively quickly (after 12 epochs), but the loss values ​​were not good, see. the image below.
 
 ![bcedice09.png](CNN%20implementation/out/test_predictions_25-11-06_08-50-55_bce09/loss_curves.png)
 ![bcedice09.png](CNN%20implementation/out/test_predictions_25-11-06_08-50-55_bce09/dice_curve.png)
 
-Opakem bylo zvolení BCE s 0.1, což způsobilo, že se síť trénovala 59 epoch než narazila na early-stop, ovšem její výsledky byly v porovnání s předchozím pokusem přívětivější.
+The opposite was choosing BCE with 0.1, which caused the network to train for 59 epochs before hitting an early-stop, but its results were more favorable compared to the previous attempt.
 
 ![bcedice01.png](CNN%20implementation/out/test_predictions_25-11-06_09-05-23/loss_curves.png)
 ![bcedice01.png](CNN%20implementation/out/test_predictions_25-11-06_09-05-23/dice_curve.png)
 
-Při zvolení BCE 0.5 (tj, obě ztrátové funkce měly stejnou váhu), tak výsledek byl opět lepší. Dosáhlo se toho, že se síť trénovala +-30 epoch se ztrátou < 0.1
+When choosing BCE 0.5 (i.e., both loss functions had the same weight), the result was again better. It was achieved that the network was trained for +-30 epochs with a loss < 0.1
 
-Při zvolení pouze BCE ztrátové funkce, se dosáhlo nejlepších výsledků v porovnání s ostaními pokusy. Počet epoch byl pouze 32, přičemž ztráty a dice vykazovaly lepší hodnoty než předešlé pokusy.
+When choosing only the BCE loss function, the best results were achieved compared to the other attempts. The number of epochs was only 32, with losses and dice showing better values ​​than previous attempts.
 
 ![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/loss_curves.png)
 ![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/dice_curve.png)
@@ -489,13 +481,13 @@ Při zvolení pouze BCE ztrátové funkce, se dosáhlo nejlepších výsledků v
 
 ### Qualitative
 
-Kvalitativní evaluace modelu se provádí relativně těžce, protože výsledky se ukazují být lepší než ground truth. Toto je způsobeno, že v prvním úkolu se na tobule použila morfologická operace opening s obdélníkovým kernelem; výsledky sítě nejsou tedy tolik hranaté a působí "lépe".
+Qualitative evaluation of the model is relatively difficult to perform, because the results turn out to be better than the ground truth. This is because in the first task the morphological operation opening with a rectangular kernel was used on the tobula; therefore the network results are not so square and look "better".
 
-Zvolená síť nakonec nenesla významné kvantitativní výkyvy. Tyto výkyvy (např. false positive) byly popsány v předchozích kapitolách, a byly způsobeny "mělkou" sítí nebo špatnou kombinací ztrátové funkce.
+The chosen network did not ultimately suffer from significant quantitative fluctuations. These fluctuations (e.g. false positives) were described in previous chapters, and were caused by a "shallow" network or a bad combination of loss functions.
 
 ### Quantitative
 
-V této kapitole jsou zobrazeny kvantitativní evaluace nejlepší sítě.
+In this chapter, quantitative evaluations of the best network are shown.
 
 ![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/prf1_curves.png)
 
@@ -503,36 +495,36 @@ V této kapitole jsou zobrazeny kvantitativní evaluace nejlepší sítě.
 
 ![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/accuracy_curve.png)
 
-![bcedice05.png](CNN%20implementation/out/test_predictions_25-11-06_10-23-06/conf_matrix_epoch_37.png)
+![bcedice05.png](CN N%20implementation/out/test_predictions_25-11-06_10-23-06/conf_matrix_epoch_37.png)
 
 ![bcedice05.png](./CNN%20implementation/out/test_predictions_25-11-06_10-23-06/progress_contours1(Copy).png)
 ![bcedice05.png](./CNN%20implementation/out/test_predictions_25-11-06_10-23-06/progress_contours(Copy).png)
 
 ## Part 5: Hyperparameter Tuning
 
-V projektu jsem použil U-Net, což je konvoluční encoder–decoder architektura pro segmentaci obrazu. Síť se skládá ze dvou částí:
+In the project I used U-Net, which is a convolutional encoder–decoder architecture for image segmentation. The network consists of two parts:
 
-- encoder (downsampling): postupně zmenšuje rozlišení a zvyšuje počet filtrů, čímž extrahuje abstraktnější rysy z obrazu,
+- encoder (downsampling): gradually reduces the resolution and increases the number of filters, thus extracting more abstract features from the image,
 
-- decoder (upsampling): obnovuje prostorové rozlišení, přičemž využívá skip-connections z encoderu, takže kombinujeme nízkoúrovňové detaily s vysokoúrovňovou semantikou.
+- decoder (upsampling): restores spatial resolution, using skip-connections from the encoder, so we combine low-level details with high-level semantics.
 
-Každá úroveň obsahuje 2× konvoluci 3×3 a aktivaci ReLU. Mezi úrovněmi se používá MaxPooling (2×2) pro zmenšení rozlišení a transposed convolution (2×2) pro zvětšení rozlišení v decoderu. Výstupní vrstva je 1×1 konvoluce, která produkuje mapu logitů (1 kanál), vhodnou pro binární segmentaci pomocí BCEWithLogitsLoss.
+Each level contains 2× 3×3 convolutions and ReLU activations. Between levels, MaxPooling (2×2) is used to reduce the resolution and transposed convolution (2×2) is used to increase the resolution in the decoder. The output layer is a 1×1 convolution that produces a logit map (1 channel), suitable for binary segmentation using BCEWithLogitsLoss.
 
-Při použítí U-Net s 2 vrstvami došlo ke zvýšení počtu pixelů jako false positive; při použítí 10 vrstev byl trénink zbytečně dlouhý.
+When using a U-Net with 2 layers, the number of pixels as false positives increased; when using 10 layers, the training was unnecessarily long.
 
-Jako nejlepší vyšla varianta pěti úrovní:
+The five-level variant came out as the best:
 
-- poskytuje dostatečnou reprezentaci i pro jemné detaily,
+- provides sufficient representation even for fine details,
 
-- nemá tak velký počet parametrů, aby se přetrénovala,
+- does not have such a large number of parameters that it overtrains,
 
-- má nejlepší poměr výkon / doba tréninku / paměť,
+- has the best performance / training time / memory ratio,
 
-- stabilní trénování a nejvyšší validační Dice a IoU.
+- stable training and the highest validation Dice and IoU.
 
-Average pooling měl problém se zachováním hran a textur; max pooling v tomto vyšel jako lepší možnost.
+Average pooling had a problem with preserving edges and textures; max pooling came out as a better option in this regard.
 
-## Ukázky výsledků
+## Sample results
 
 ![vysledek](./CNN%20implementation/out/test_predictions_25-11-06_10-23-06/test_preds/test_00076.png)
 
@@ -547,154 +539,151 @@ Average pooling měl problém se zachováním hran a textur; max pooling v tomto
 # Advanced CNN, transfer learning, and XAI
 
 > Author: Kryštof Čejchan
-
 ## Objective
-Implementace a evaluace klasifikačních modelů (CNN), analýza jejich rozhodování (XAI) a Siamské sítě.
+Implementation and evaluation of classification models (CNN), analysis of their decision (XAI) and Siamese networks.
 ## Part 1: Classification (Original vs. Inpainted)
 
-### Příprava datasetu
+### Dataset preparation
 
-Dataset byl připraven z bitmapových obrazů z předešlých úloh. Dohromady měl dataset ± 300 obrazů, z toho 50% bylo inpainted a zbytek byl ponechán beze změn (50%).
+The dataset was prepared from bitmap images from previous tasks. In total, the dataset had ± 300 images, of which 50% were inpainted and the rest were left unchanged (50%).
 
-Pro inpainted byly použity masky cílií, které byly zdilatovány a následně pomocí funkce `cv.inpaint` bylo nejméně pět náhodných buněk "překresleno".
+For inpainted, cilia masks were used, which were dilated and then at least five random cells were "repainted" using the function `cv.inpaint`.
 
 <img alt="img_008.png" height="256" src="Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/img_008.png" width="256"/>
 <img alt="7.png" height="256" src="Advanced%20CNN,%20transfer%20learning,%20and%20XAI/data/orig_inpainted/inpainted/7.png" width="256"/>
 
-### Modely CNN
+### CNN Models
 
-#### Vlastní síť
+#### Custom Network
 
-Feature Extractor: Série pěti konvolučních bloků, které postupně snižují prostorovou dimenzi obrazu a zvyšují hloubku příznaků (počet kanálů).
+Feature Extractor: A series of five convolutional blocks that gradually reduce the spatial dimension of the image and increase the depth of the features (number of channels).
 
-Klasifikátor: Plně propojené (Fully Connected) vrstvy, které převádějí extrahované příznaky na finální predikci.
+Classifier: Fully Connected layers that convert the extracted features into a final prediction.
 
-Na vstupu je greyscale obrázek (tj. jeden kanál) s rozlišením 256x256. Další vrstvy jsou následujicí:
+The input is a greyscale image (i.e. one channel) with a resolution of 256x256. The other layers are as follows:
 
-
-| Část sítě    | Vrstva | Typ Operace      | Konfigurace                  | Výstupní Tenzor |
-|:-------------|:-------|:-----------------|:-----------------------------|:----------------|
-| Vstup        | -      | -                | -                            | (1, 256, 256)   |
-| Blok 1       | conv1  | Konvoluce + ReLU | k=5, s=1, p=2                | (16, 256, 256)  |
-| -            | pool1  | Max Pooling      | k=2, s=2                     | (16, 128, 128)  |
-| Blok 2       | conv2  | Konvoluce + ReLU | k=5, s=1, p=2                | (32, 128, 128)  |
-| -            | pool2  | Max Pooling      | k=2, s=2                     | (32, 64, 64)    |
-| Blok 3       | conv3  | Konvoluce + ReLU | k=3, s=1, p=1                | (64, 64, 64)    |
-| -            | pool3  | Max Pooling      | k=2, s=2                     | (64, 32, 32)    |
-| Blok 4       | conv4  | Konvoluce + ReLU | k=3, s=1, p=1                | (128, 32, 32)   |
-| -            | pool4  | Max Pooling      | k=2, s=2                     | (128, 16, 16)   |
-| Blok 5       | conv5  | Konvoluce + ReLU | k=3, s=1, p=1                | (256, 16, 16)   |
-| -            | pool5  | Max Pooling      | k=2, s=2                     | (256, 8, 8)     |
-| Flatten      | -      | Zploštění        | -                            | (256 * 64)      |
-| Klasifikátor | fc1    | Linear + ReLU    | Vstup: 256 * 64, Výstup: 512 | (512)           |
-| -            | fc2    | Linear + ReLU    | Vstup: 512, Výstup: 128      | (128)           |
-| -            | fc3    | Linear (Logits)  | Vstup: 128, Výstup: 2        | (2)             |
+| Network Part | Layer | Operation Type | Configuration | Output Tensor |
+|:-------------|:------------|:----------------|:----------------------------|:----------------|
+| Input | - | - | - | (1, 256, 256) |
+| Block 1 | conv1 | Convolution + ReLU | k=5, s=1, p=2 | (16, 256, 256) |
+| - | pool1 | Max Pooling | k=2, s=2 | (16, 128, 128) |
+| Block 2 | conv2 | Convolution + ReLU | k=5, s=1, p=2 | (32, 128, 128) |
+| - | pool2 | Max Pooling | k=2, s=2 | (32, 64, 64) |
+| Block 3 | conv3 | Convolution + ReLU | k=3, s=1, p=1 | (64, 64, 64) |
+| - | pool3 | Max Pooling | k=2, s=2 | (64, 32, 32) |
+| Block 4 | conv4 | Convolution + ReLU | k=3, s=1, p=1 | (128, 32, 32) |
+| - | pool4 | Max Pooling | k=2, s=2 | (128, 16, 16) |
+| Block 5 | conv5 | Convolution + ReLU | k=3, s=1, p=1 | (256, 16, 16) |
+| - | pool5 | Max Pooling | k=2, s=2 | (256, 8, 8) |
+| Flatten | - | Flatten | - | (256 * 64) |
+| Classifier | fc1 | Linear + ReLU | Input: 256 * 64, Output: 512 | (512) |
+| - | fc2 | Linear + ReLU | Input: 512, Output: 128 | (128) |
+| - | fc3 | Linear (Logits) | Input: 128, Output: 2 | (2) |
 
 `k = kernel_size; s = stride; p = padding`
 
-
 #### Transfer learning
 
-Standardní ResNet18 je navržen pro barevné RGB obrázky (3 kanály) a klasifikaci do 1000 tříd. Pro potřeby této úlohy (greyscale obrázky [1 kanál], klasifikace do 2 tříd) byly provedeny následující modifikace:
+The standard ResNet18 is designed for color RGB images (3 channels) and classification up to 1000 classes. For the needs of this task (greyscale images [1 channel], classification up to 2 classes) the following modifications were made:
 
-1. Adaptace vstupní vrstvy (Grayscale)
+1. Adaptation of the input layer (Grayscale)
 
-   Původní vstupní konvoluční vrstva (conv1) očekává 3 vstupní kanály (RGB). Jelikož pracujeme s černobílými (grayscale) obrázky (1 kanál), byla tato vrstva nahrazena novou konvolucí:
+The original input convolutional layer (conv1) expects 3 input channels (RGB). Since we are working with grayscale images (1 channel), this layer was replaced by a new convolution:
 
-   Původní: in_channels=3
-   Nová: in_channels=1 (ostatní parametry jako kernel size, stride a padding zůstaly zachovány).
+Original: in_channels=3
+New: in_channels=1 (other parameters such as kernel size, stride and padding were preserved).
 
-   Aby se nepřišlo o naučené informace z RGB verze, váhy nové vrstvy nebyly inicializovány náhodně. Místo toho byl vypočítán průměr vah přes původní 3 kanály.
+In order not to lose the information learned from the RGB version, the weights of the new layer were not initialized randomly. Instead, the average of the weights over the original 3 channels was calculated.
 
-    ```py
-    self.model.conv1.weight.data = original_conv1.weight.data.mean(dim=1, keepdim=True)
-    ```
+```py
+self.model.conv1.weight.data = original_conv1.weight.data.mean(dim=1, keepdim=True)
+```
 
-   Tato technika umožňuje síti reagovat na strukturní rysy v černobílém obraze podobně, jako by reagovala na jasovou složku barevného obrazu.
+This technique allows the network to respond to structural features in a grayscale image in a similar way as it would respond to the luminance component of a color image.
 
-2. Úprava klasifikační hlavy (Head)
+2. Head Modification
 
-   Původní plně propojená vrstva (fc), která mapovala příznaky na 1000 tříd ImageNetu, byla odstraněna a nahrazena novou lineární vrstvou odpovídající našemu zadání:
+The original fully connected layer (fc), which mapped features to 1000 ImageNet classes, has been removed and replaced with a new linear layer corresponding to our specification:
 
-   Vstup: 512 příznaků (výstup z posledního ResNet bloku).
+Input: 512 features (output from the last ResNet block).
 
-   Výstup: num_classes (v našem případě 2: Original vs. Inpainted).
+Output: num_classes (in our case 2: Original vs. Inpainted).
 
-3. Strategie trénování (Freezing)
+3. Training Strategy (Freezing)
 
-   Třída podporuje parametr freeze_base, který umožňuje zmrazit váhy extraktoru příznaků:
+The class supports the freeze_base parameter, which allows freezing the weights of the feature extractor:
 
-   Pokud freeze_base=True: Gradienty se počítají pouze pro novou klasifikační hlavu (fc). To je vhodné pro rychlé doladění (fine-tuning), kdy předpokládáme, že naučené příznaky z ImageNetu jsou dostatečně obecné.
+If freeze_base=True: Gradients are calculated only for the new classification head (fc). This is suitable for fast fine-tuning, when we assume that the learned features from ImageNet are general enough.
 
-   Pokud freeze_base=False (výchozí v kódu): Trénuje se celá síť. Váhy z ImageNetu slouží jako velmi kvalitní startovní bod inicializace, ale během tréninku se jemně přizpůsobují specifikům datasetu cílií.
+If freeze_base=False (default in the code): The entire network is trained. The weights from ImageNet serve as a very good starting point for initialization, but during training they are finely adjusted to the specifics of the target dataset.
 
-### Trénink
+### Training
 
-1. Rozdělení a příprava dat
+1. Data division and preparation
 
-   Data jsou načítána z adresářové struktury, kde jsou třídy (original, inpainted) odděleny do podadresářů. Před samotným trénováním probíhá následující zpracování:
+Data is loaded from a directory structure, where classes (original, inpainted) are separated into subdirectories. Before the actual training, the following processing takes place:
 
-   Rozdělení datasetu: Všechny dostupné snímky jsou náhodně zamíchány a rozděleny na tři disjunktní sady na základě definovaných poměrů (70/15/15):
+Dataset division: All available images are randomly shuffled and divided into three disjoint sets based on defined ratios (70/15/15):
 
-   Trénovací sada: Slouží k optimalizaci vah modelu.
+Training set: Used to optimize the model weights.
 
-   Validační sada: Slouží k průběžnému vyhodnocování modelu a rozhodování o předčasném ukončení (Early Stopping).
+Validation set: Used to continuously evaluate the model and decide on early stopping.
 
-   Testovací sada: Použita výhradně po skončení trénování pro finální změření výkonnosti modelu.
+Test set: Used exclusively after training for the final measurement of model performance.
 
-   Data Augmentace: Pro zvýšení robustnosti modelu a prevenci přeučení (overfitting) je na trénovací sadu aplikována augmentace dat ve formě rotací o 90°, 180° a 270°. Validační a testovací sady zůstávají bez rotací (úhel 0°).
+Data Augmentation: To increase the robustness of the model and prevent overfitting, data augmentation is applied to the training set in the form of rotations of 90°, 180° and 270°. The validation and test sets remain without rotations (angle 0°).
 
-2. Konfigurace trénování
+2. Training Configuration
 
-   Pro optimalizaci modelu byly zvoleny následující parametry a komponenty:
+The following parameters and components were selected for model optimization:
 
-   Ztrátová funkce: Byla použita CrossEntropyLoss
+Loss function: CrossEntropyLoss was used
 
-   Optimalizátor: Byl zvolen algoritmus Adam (Adaptive Moment Estimation), který efektivně přizpůsobuje rychlost učení pro jednotlivé parametry sítě.
+Optimizer: The Adam (Adaptive Moment Estimation) algorithm was selected, which effectively adapts the learning rate for individual network parameters.
 
-   Model: Skript využívá třídu ResNetClassifier nebo Net (podle toho, zda se jedná o transfer learning nebo ne), která je inicializována a přesunuta na výpočetní zařízení CPU.
+Model: The script uses the ResNetClassifier or Net class (depending on whether it is transfer learning or not), which is initialized and moved to the CPU computing device.
 
-3. Trénovací smyčka a Early Stopping
+3. Training Loop and Early Stopping
 
-   Trénování probíhá v cyklech (epochách). Každá epocha se skládá ze dvou fází:
+Training takes place in cycles (epochs). Each epoch consists of two phases:
 
-   Trénovací fáze (model.train()):
+Training phase (model.train()):
 
-   Model zpracovává data po dávkách (batches).
+The model processes data in batches.
 
-   Pro každou dávku se vypočítá chyba (loss), provedou se zpětné propagace (backpropagation) a aktualizují se váhy pomocí optimalizátoru.
+For each batch, the error (loss) is calculated, backpropagation is performed, and the weights are updated using the optimizer.
 
-   Validační fáze (model.eval()):    
-   Model je přepnut do evaluačního režimu (vypnutí dropoutu, fixace batch norm).
+Validation phase (model.eval()):
+The model is switched to evaluation mode (dropout is disabled, batch norm is fixed).
 
-   Bez výpočtu gradientů (torch.no_grad()) se provede predikce na validační sadě.
+Without calculating gradients (torch.no_grad()), prediction is performed on the validation set.
 
-   Výpočet metrik: Výstupy sítě (logity pro 2 třídy) jsou transformovány na binární predikci rozdílem skóre (class_1 - class_0), což umožňuje výpočet Accuracy, Precision, Recall a F1-Score pomocí třídy Metrics.
+Metrics calculation: The network outputs (logits for 2 classes) are transformed into a binary prediction by the difference of scores (class_1 - class_0), which allows the calculation of Accuracy, Precision, Recall and F1-Score using the Metrics class.
 
-   Strategie Early Stopping (Předčasné zastavení): Aby se předešlo přeučení a plýtvání výpočetním časem, je implementován mechanismus Early Stopping.
+Early Stopping Strategy: To avoid overfitting and wasting computational time, the Early Stopping mechanism is implemented.
 
-   Monitoruje se hodnota validační ztráty (validation loss).
+The validation loss value is monitored.
 
-   Pokud je aktuální validační ztráta nižší než doposud nejlepší zaznamenaná, model (jeho váhy) se uloží jako nejlepší kandidát.
+If the current validation loss is lower than the best recorded so far, the model (its weights) is saved as the best candidate.
 
-   Pokud se ztráta nezlepší po stanovený počet epoch (parametr PATIENCE), trénování je automaticky ukončeno.
+If the loss does not improve after a specified number of epochs (PATIENCE parameter), training is automatically terminated.
 
-4. Vizualizace a finální testování
+4. Visualization and final testing
 
-   Po ukončení tréninku skript generuje grafy průběhu:
+After training, the script generates progress graphs:
 
-   Loss Graph: Porovnání vývoje trénovací a validační chyby v čase.
+Loss Graph: Comparison of the evolution of training and validation errors over time.
 
-   Accuracy Graph: Vývoj přesnosti modelu na validační sadě.
+Accuracy Graph: Evolution of the model accuracy on the validation set.
 
-   V poslední fázi se načtou váhy modelu s nejnižší validační chybou (nikoliv váhy z poslední epochy) a provede se inferenece na testovací sadě.
+In the last phase, the weights of the model with the lowest validation error (not the weights from the last epoch) are loaded and inference is performed on the test set.
 
-   Snímky jsou na základě predikce fyzicky roztříděny do složek predicted_original a predicted_inpainted pro vizuální kontrolu.
+Based on the prediction, the images are physically sorted into predicted_original and predicted_inpainted folders for visual inspection.
 
-   Jsou vypočítány finální metriky výkonnosti na datech, která model během tréninku nikdy neviděl.
+Final performance metrics are calculated on data that the model has never seen during training.
 
-### Výstupy
-Moje síť:
+### Outputs
+My network:
 
 ![accuracy_net.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/accuracy_net.png)
 
@@ -702,7 +691,7 @@ Transfer learning:
 
 ![accuracy_net.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/accuracy_net.png)
 
-Moje síť:
+My network:
 
 ![graph_loss_net.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/graph_loss_net.png)
 
@@ -711,13 +700,11 @@ Transfer learning:
 ![graph_loss_net.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/graph_loss_net.png)
 
 
-
-
-Moje síť:
+My network:
 
 ![confusion_matrix.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/confusion_matrix.png)
 
-| Metrika   | Skóre  |
+| Metric   | Score  |
 |-----------|--------|
 | Precision | 0.7391 |
 | Recall    | 1.0000 |
@@ -730,44 +717,42 @@ Transfer learning:
 ![confusion_matrix.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/confusion_matrix.png)
 
 
-| Metrika   | Skóre  |
+| Metric   | Score  |
 |-----------|--------|
 | Precision | 1.0000 |
 | Recall    | 1.0000 |
 | F1-Score  | 1.0000 |
 | IoU       | 1.0000 |
 
-
 ## Part 2: Model Interpretability
 
-Pro validaci rozhodovacího procesu neuronové sítě a ověření, zda se model zaměřuje na relevantní vizuální znaky, byla implementována sada metod pro vysvětlitelnou umělou inteligenci (Explainable AI - XAI). K tomuto účelu byla využita knihovna Captum, která umožňuje analyzovat příspěvky jednotlivých pixelů k finální predikci modelu.
+To validate the decision-making process of the neural network and verify that the model focuses on relevant visual features, a set of Explainable AI (XAI) methods was implemented. For this purpose, the Captum library was used, which allows analyzing the contributions of individual pixels to the final prediction of the model.
 
-Analýza byla provedena na natrénovaném modelu (Net nebo ResNetClassifier) s využitím tří odlišných gradientních metod. Každá z nich poskytuje jiný pohled na to, co model považuje za důležité.
+The analysis was performed on the trained model (Net or ResNetClassifier) ​​using three different gradient methods. Each of them provides a different perspective on what the model considers important.
 
-Použité metody vizualizace
+Visualization methods used
 
 1. Saliency (Gradient-based):
 
-   Základní metoda, která počítá gradient výstupu vzhledem ke vstupnímu obrázku. Výsledná mapa indikuje, které pixely by při malé změně nejvíce ovlivnily výsledné skóre třídy.
+A basic method that calculates the gradient of the output relative to the input image. The resulting map indicates which pixels would have the most impact on the resulting class score if changed slightly.
 
-   Vizualizace: Používá absolutní hodnotu gradientů (sign="absolute_value") a barevnou mapu inferno, aby zvýraznila oblasti s nejvyšší citlivostí bez ohledu na směr vlivu.
-
+Visualization: Uses the absolute value of the gradients (sign="absolute_value") and the inferno color map to highlight the areas with the highest sensitivity regardless of the direction of the influence.
 
 2. Integrated Gradients (IG):
 
-   Tato metoda řeší problém saturace gradientů integrováním gradientů podél cesty od referenčního "nulového" vstupu (černý obrázek) k aktuálnímu vstupu. Poskytuje stabilnější a méně zašuměné výsledky než prostá Saliency mapa.
+This method solves the problem of gradient saturation by integrating gradients along the path from the reference "null" input (black image) to the current input. It provides more stable and less noisy results than a simple Saliency map.
 
-   Vizualizace: Zobrazuje pouze pozitivní příspěvky (sign="positive", mapa Reds), tedy ty oblasti, které přímo zvyšují pravděpodobnost predikované třídy.
+Visualization: Shows only positive contributions (sign="positive", Reds map), i.e. those areas that directly increase the probability of the predicted class.
 
 3. Guided Grad-CAM:
 
-   Kombinuje lokalizační schopnost metody Grad-CAM s detailním rozlišením Guided Backpropagation. Tato metoda sleduje aktivace v poslední konvoluční vrstvě sítě, která obsahuje nejvyšší úroveň sémantické informace.
+Combines the localization capability of the Grad-CAM method with the detailed resolution of Guided Backpropagation. This method tracks activations in the last convolutional layer of the network, which contains the highest level of semantic information.
 
-   Konfigurace: Jako cílová vrstva (target_layer) byla pro vlastní síť Net zvolena vrstva conv5 (u ResNetu by to byl poslední blok layer4). Tato vrstva slouží jako zdroj pro výpočet vah důležitosti jednotlivých map příznaků.
+Configuration: The conv5 layer was chosen as the target layer (target_layer) for the Net network itself (in ResNet it would be the last block layer4). This layer serves as the source for calculating the importance weights of individual feature maps.
 
-   Vizualizace: Výstupem je detailní mapa (mapa viridis), která zvýrazňuje klíčové struktury (např. hrany nebo textury řasinek) vedoucí k rozhodnutí.
+Visualization: The output is a detailed map (viridis map) that highlights key structures (e.g. edges or cilia textures) leading to a decision.
 
-### Moje síť
+### My network
 ![compare_18.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/compare_18.png)
 
 ![compare_98.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/compare_98.png)
@@ -789,7 +774,7 @@ Použité metody vizualizace
 ![compare_62.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/compare_62.png)
 
 
-### Porovnání (moje síť vs resnet)
+### Comparison (my network vs. resnet)
 ![compare_0.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/compare_0.png)
 
 ![compare_0.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/compare_0.png)
@@ -799,65 +784,65 @@ Použité metody vizualizace
 ![compare_99.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/resnet/compare_99.png)
 
 ## Part 3: Siamese Networks
-Pro úlohu detekce inpaintingu byla implementována Siamská neuronová síť (Siamese Neural Network). Na rozdíl od klasických klasifikačních sítí, které se učí přiřadit vstupu konkrétní třídu, se siamská síť učí metriku podobnosti. Cílem je transformovat vstupní obrázky do vektorového prostoru (embedding space) tak, aby vektory obrázků stejné třídy byly blízko u sebe a vektory rozdílných tříd daleko od sebe.
+A Siamese Neural Network was implemented for the inpainting detection task. Unlike classical classification networks that learn to assign a specific class to the input, a Siamese network learns a similarity metric. The goal is to transform the input images into a vector space (embedding space) so that the vectors of images of the same class are close to each other and the vectors of different classes are far from each other.
 
-1. Architektura modelu
+1. Model architecture
 
-   Jako základ (backbone) modelu byl zvolen ResNet18, předtrénovaný na ImageNetu, což zajišťuje robustní extrakci příznaků.
+ResNet18, pre-trained on ImageNet, was chosen as the backbone of the model, which ensures robust feature extraction.
 
-   Adaptace vstupu: Jelikož vstupní data jsou černobílá (1 kanál), byla první konvoluční vrstva ResNetu modifikována. Původní váhy pro 3 RGB kanály byly zprůměrovány do jednoho kanálu, což umožňuje využít předtrénované informace i pro grayscale vstupy.
+Input adaptation: Since the input data is black and white (1 channel), the first convolutional layer of ResNet was modified. The original weights for the 3 RGB channels were averaged into one channel, which allows the use of pre-trained information for grayscale inputs as well.
 
-   Sdílené váhy: Síť se skládá ze dvou identických větví, které sdílejí tytéž váhy. Oba obrázky z páru procházejí stejnou transformací.
+Shared weights: The network consists of two identical branches that share the same weights. Both images in the pair undergo the same transformation.
 
-   Embedding vrstva: Původní klasifikační hlava ResNetu byla nahrazena sekvencí Linear -> ReLU -> Linear, která mapuje extrahované příznaky do 128-dimenzionálního výstupního vektoru.
+Embedding layer: The original ResNet classification head has been replaced by a Linear -> ReLU -> Linear sequence that maps the extracted features into a 128-dimensional output vector.
 
-2. Příprava dat a párování
+2. Data preparation and matching
 
-   Pro trénování siamské sítě je klíčová tvorba párů. Třída SiameseDataset generuje trénovací vzorky dynamicky:
+Pairing is key to training a Siamese network. The SiameseDataset class generates training samples dynamically:
 
-   Pozitivní pár (Label 0): Dva různé obrázky stejné třídy (např. Original–Original nebo Inpainted–Inpainted).
+Positive pair (Label 0): Two different images of the same class (e.g. Original–Original or Inpainted–Inpainted).
 
-   Negativní pár (Label 1): Dva obrázky rozdílných tříd (Original–Inpainted).
+Negative pair (Label 1): Two images of different classes (Original–Inpainted).
 
-   Vyvážení: Dataset je konstruován tak, aby pravděpodobnost výběru pozitivního a negativního páru byla 50:50, což zabraňuje biasu sítě k jedné z variant.
+Balancing: The dataset is constructed so that the probability of selecting a positive and negative pair is 50:50, which prevents the network from biasing towards one of the variants.
 
-3. Ztrátová funkce (Contrastive Loss)
+3. Loss function (Contrastive Loss)
 
-   K optimalizaci vah byla použita funkce Contrastive Loss. Tato funkce pracuje s Euklidovskou vzdáleností Dw
-   mezi výstupními vektory sítě.
+The Contrastive Loss function was used to optimize the weights. This function works with the Euclidean distance Dw
+between the output vectors of the network.
 
-4. Průběh trénování
+4. Training process
 
-   Trénování probíhá pomocí optimalizátoru Adam s learning rate 0.0005.
+Training is performed using the Adam optimizer with a learning rate of 0.0005.
 
-   Evaluace přesnosti: Přesnost modelu není měřena klasicky, ale na základě prahování vzdálenosti. Pokud je vzdálenost mezi vektory menší než threshold=margin/2, je pár klasifikován jako "shodný".
+Accuracy evaluation: The accuracy of the model is not measured classically, but based on distance thresholding. If the distance between vectors is less than threshold=margin/2, the pair is classified as "identical".
 
-   Early Stopping: Pro zabránění přeučení je monitorována validační ztráta (Loss). Pokud se nezlepší po stanovený počet epoch (PATIENCE), trénování je předčasně ukončeno a uloží se model s nejnižší validační chybou.
+Early Stopping: To prevent overfitting, the validation loss (Loss) is monitored. If it does not improve after a specified number of epochs (PATIENCE), training is terminated early and the model with the lowest validation error is saved.
 
-### Metriky
-#### VÝSLEDKY EVALUACE (Threshold=0.5)
-| Metrika  | Skóre |
-|----------|-------|
-| Accuracy | 0.6   |
-| Recall   | 0.72  |
-| F1-Score | 0.51  |
-| IoU      | 0.6   |
+### Metrics
+#### EVALUATION RESULTS (Threshold=0.5)
+| Metrics | Score |
+|-----|------|
+| Accuracy | 0.6 |
+| Recall | 0.72 |
+| F1-Score | 0.51 |
+| IoU | 0.6 |
 
-| Metrika  | Skóre |
-|----------|-------|
-| Accuracy | 0.6   |
-| Recall   | 0.72  |
-| F1-Score | 0.51  |
-| IoU      | 0.6   |
+| Metrics | Score |
+|---------|-------|
+| Accuracy | 0.6 |
+| Recall | 0.72 |
+| F1-Score | 0.51 |
+| IoU | 0.6 |
 
-| Třída (Class)    | Precision | Recall | F1-Score | Support |
-|:-----------------|:---------:|:------:|:--------:|:-------:|
-| **Stejné (0)**   |   0.51    |  0.72  |   0.60   |   25    |
-| **Různé (1)**    |   0.72    |  0.51  |   0.60   |   35    |
-|                  |           |        |          |         |
-| **Accuracy**     |           |        | **0.60** | **60**  |
-| **Macro Avg**    |   0.62    |  0.62  |   0.60   |   60    |
-| **Weighted Avg** |   0.63    |  0.60  |   0.60   |   60    |
+| Class | Precision | Recall | F1-Score | Support |
+|:-----------------|:--------:|:-------:|:-------:|:-------:|
+| **Same (0)** | 0.51 | 0.72 | 0.60 | 25 |
+| **Different (1)** | 0.72 | 0.51 | 0.60 | 35 |
+| | | | | |
+| **Accuracy** | | | | **0.60** | **60** |
+| **Macro Avg** | 0.62 | 0.62 | 0.60 | 60 |
+| **Weighted Avg** | 0.63 | 0.60 | 0.60 | 60 |
 
 
 ![training_metrics_siam.png](Advanced%20CNN,%20transfer%20learning,%20and%20XAI/readme_files/siam/training_metrics_siam.png)
@@ -867,102 +852,103 @@ Pro úlohu detekce inpaintingu byla implementována Siamská neuronová síť (S
 
 # Movement detection & optical flow
 
-> Autor: Kryštof Čejchan
+> Author: Kryštof Čejchan
 
 
-_Pozn.: v readme jsou gify, některé se načítají delší dobu kvůli jejich velikosti._
+_Note.: readme contains gif files that are large and hence may taky a while to load._
 
-V rámci tohoto úkolu jsem implementoval algoritmy a metody pro superpixely a detekci poh ybu (motion detection).
+In this task, I implemented algorithms and methods for superpixels and motion detection.
 
 # Part 1: Comparison of superpixel methods and parameter choices (number of superpixels, threshold values).
 
-Tato část úkolu se zaměřovala na segmentaci snímků pomocí superpixelových metod. Cílem bylo nahradit práci s
-jednotlivými pixely efektivnější reprezentací pomocí superpixelů a klasifikovat je na základě barevné podobnosti s
-referenčním vzorkem.
+This part of the task focused on image segmentation using superpixel methods. The goal was to replace working with
+individual pixels with a more efficient representation using superpixels and classify them based on color similarity with a
+reference sample.
 
-Prvním krokem bylo definování cílové barvy, kterou chceme v obrázku detekovat.
-Pro tento účel je nejprve zobrazen vstupní obrázek uživateli, který vybere kurzorem roi. Barvy pixelů v tomto roi se
-zprůměrují, což je výsledná cílová barva.
+The first step was to define the target color that we want to detect in the image.
+For this purpose, the input image is first displayed to the user, who selects an ROI with the cursor. The colors of the pixels in this ROI are
+averaged, which is the resulting target color.
 
 ```python
 roi_rect = cv.selectROI("select rectangle sample", img, showCrosshair=True, fromCenter=False)
 ```
 
-Při testování se volila následující barva jako ta cílová: `(L*a*b*): [ 60.25 146.97 122.47]`
+During testing, the following color was chosen as the target: `(L*a*b*): [ 60.25 146.97 122.47]`
 
-Extrakce superpixelů byla implementovaná pomocí tří metod: SLICO, LSC, SEEDS. Threshold pro segmentaci byl nastaven 85.
+Superpixel extraction was implemented using three methods: SLICO, LSC, SEEDS. The threshold for segmentation was set to 85.
 
 ## SLICO
 
-Byly vyzkoušeny dvě nastavení parametrů algoritmů, jejich efekt se nijak zásadně nelišil. Při `region_size=20` je vidět,
-že jsou regiony menší (logicky), ale jinak je segmentace téměř identická; heatmapa každopádně působí více přesněji bez
-velkých regionů, ale bylo to za cenu výpočetní složitosti.
-`ruler` parametr se na výsledném obrázku moc neprojevil, kromě pár nových segmentů.
+Two algorithm parameter settings were tested, their effect did not differ significantly. With `region_size=20` it can be seen that
+the regions are smaller (logically), but otherwise the segmentation is almost identical; the heatmap seems to be more accurate without
+large regions, but it was at the cost of computational complexity.
 
-### parametry: region_size=30, ruler=15.0
+The `ruler` parameter did not have much effect on the resulting image, except for a few new segments.
+
+### parameters: region_size=30, ruler=15.0
 
 ![SLICO - Segmentation_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new-run/SLICO%20-%20Segmentation_screenshot_16.12.2025.png)
 ![SLICO - Distance Heatmap_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new-run/SLICO%20-%20Distance%20Heatmap_screenshot_16.12.2025.png)
 
-### parametry: region_size=30, ruler=100.0
+### parameters: region_size=30, ruler=100.0
 
 ![SLICO - Segmentation_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new_run_3/SLICO%20-%20Segmentation_screenshot_16.12.2025.png)
 ![SLICO - Distance Heatmap_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new_run_3/SLICO%20-%20Distance%20Heatmap_screenshot_16.12.2025.png)
 
-### parametry: region_size=20, ruler=8.0
+### parameters: region_size=20, ruler=8.0
 
 ![SLICO - Segmentation_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new_run_2/SLICO%20-%20Segmentation_screenshot_16.12.2025.png)
 ![SLICO - Distance Heatmap_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new_run_2/SLICO%20-%20Distance%20Heatmap_screenshot_16.12.2025.png)
 
 ## LSC
 
-`region_size` opět měnil akorát velikost zaregistrovaných segmetací. `ratio` měnilo "zaoblení" segment, čím větší
-hodnota, tím více "hranatě" segment vypadal.
+`region_size` again changed only the size of the registered segmentations. `ratio` changed the "roundness" of the segment, the larger
+the value, the more "square" the segment looked.
 
-### parametry: region_size=30, ratio=0.075
+### parameters: region_size=30, ratio=0.075
 
 ![LSC - Segmentation_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new-run/LSC%20-%20Segmentation_screenshot_16.12.2025.png)
 ![LSC - Distance Heatmap_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new-run/LSC%20-%20Distance%20Heatmap_screenshot_16.12.2025.png)
 
-### parametry: region_size=20, ratio=0.5
+### parameters: region_size=20, ratio=0.5
 
 ![LSC - Segmentation_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new_run_2/LSC%20-%20Segmentation_screenshot_16.12.2025.png)
 ![LSC - Distance Heatmap_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new_run_2/LSC%20-%20Distance%20Heatmap_screenshot_16.12.2025.png)
 
 ## SEEDS
 
-U SEEDS metody je zajímavé si všimnout heatmapy, kde je vidět, že byly zvoleny superpixely na základě `num_superpixels`,
-což mnohdy vede k "prázdným" superpixelům.
+It is interesting to note the heatmap for the SEEDS method, where it can be seen that superpixels were selected based on `num_superpixels`,
+which often leads to "empty" superpixels.
 
-### parametry: num_superpixels=8000, num_levels=20
+### parameters: num_superpixels=8000, num_levels=20
 
 ![SEEDS - Segmentation_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new-run/SEEDS%20-%20Segmentation_screenshot_16.12.2025.png)
 ![SEEDS - Distance Heatmap_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new-run/SEEDS%20-%20Distance%20Heatmap_screenshot_16.12.2025.png)
 
-### parametry: num_superpixels=6000, num_levels=10
+### parameters: num_superpixels=6000, num_levels=10
 
 ![SEEDS - Segmentation_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new_run_2/SEEDS%20-%20Segmentation_screenshot_16.12.2025.png)
 ![SEEDS - Distance Heatmap_screenshot_16.12.2025.png](Movement%20detection%20&%20optical%20flow/output/superpixels/3_new_run_2/SEEDS%20-%20Distance%20Heatmap_screenshot_16.12.2025.png)
 
 # Part 2: Visual comparison of background subtraction methods.
 
-Tato část se věnuje analýze pohybu ve videosekvencích pomocí metod background subtraction a optického toku.
+This part is dedicated to the analysis of motion in video sequences using background subtraction and optical flow methods.
 
 ## Background Subtraction
 
-Výstupem je čistá maska pohybujících se objektů, která slouží jako vstup pro další analýzu nebo počítání objektů.
+The output is a clean mask of moving objects, which serves as input for further analysis or object counting.
 
 ![Screencast from 2025-12-13 13-31-04.gif](https://krystofcejchan.cz/projects/medical_img_processing/Screencast%20from%202025-12-13%2013-31-04.gif)
 
 # Sparse Optical Flow
 
-Nejprve jsou v obraze detekovány "význačné body" pomocí detektoru `goodFeaturesToTrack`. Tyto body
-typicky odpovídají rohům nebo výrazným texturám na vozidlech.
+First, "salient points" are detected in the image using the `goodFeaturesToTrack` detector. These points
+typically correspond to corners or prominent textures on vehicles.
 
-Metoda následně vypočítává posun těchto bodů mezi po sobě jdoucími snímky.
+The method then calculates the displacement of these points between successive frames.
 
-Výsledkem je vizualizace pohybových vektorů, které ukazují dráhu pohybu jednotlivých objektů v čase. Narorozdíl od
-`dense optical flow` byla tato metoda výpočeetně nenáročná a zvládala video zpracovávat v realném čase.
+The result is a visualization of motion vectors that show the path of movement of individual objects over time. Unlike
+`dense optical flow`, this method was computationally inexpensive and was able to process the video in real time.
 
 ![Screencast from 2025-12-13 13-40-29.gif](https://krystofcejchan.cz/projects/medical_img_processing/Screencast%20from%202025-12-13%2013-40-29.gif)
 
@@ -970,73 +956,72 @@ Výsledkem je vizualizace pohybových vektorů, které ukazují dráhu pohybu je
 
 # Dense Optical Flow
 
-Další implemetovaná metoda byla Dense Optical Flow, která vypočítává vektor pohybu
-pro každý pixel v obraze - výpočet byl náročný, proto se zvolilo video s nízkým rozlišením.
+Another implemented method was Dense Optical Flow, which calculates the motion vector
+for each pixel in the image - the calculation was demanding, so a low-resolution video was chosen.
 
-Výstupem je husté pole vektorů, které popisuje pohyb celé scény.
+The output is a dense vector field that describes the movement of the entire scene.
 
-Pro vizualizaci byl použit barevný kód (HSV prostor), kde barva určuje směr pohybu (např. červená = doprava, modrá =
-doleva) a sytost/jas určuje rychlost pohybu (jasnější = rychlejší pohyb).
+A color code (HSV space) was used for visualization, where the color determines the direction of movement (e.g. red = right, blue =
+left) and saturation/brightness determines the speed of movement (brighter = faster movement).
 
-## Dense optiocal flow bez úprav morfologickými operacemi
+## Dense optiocal flow without morphological operations
 
 ![Screencastfrom2025-12-1313-50-54-ezgif.com-video-to-gif-converter.gif](https://krystofcejchan.cz/projects/medical_img_processing/Screencastfrom2025-12-1313-50-54-ezgif.com-video-to-gif-converter.gif)
 
-## Dense optiocal flow se upravami morfologickými operacemi
+## Dense optiocal flow with morphological operations
 
-Při použití morfologické operace `close`, se lépe vyplnila maska, což způsobilo, že se bounding rectangle nezmenšoval (
-viz. předchozí obrázek)
+When using the morphological operation `close`, the mask was filled better, which caused the bounding rectangle not to shrink (
+see previous image)
 
 ![Screencastfrom2025-12-1314-54-53-ezgif.com-video-to-gif-converter.gif](Movement%20detection%20&%20optical%20flow/output/dense/Screencastfrom2025-12-1314-54-53-ezgif.com-video-to-gif-converter.gif)
 
 # Part 2 (Discussion): Answers to the implementation challenges in Optical Flow (handling new objects, duplicates, and collisions).
 
-## Detekce nových objektů
+## New object detection
 
 ### Sparse
 
-V každém třetím snímku (`frame_idx % detect_interval == 0`) se volá funkce `cv.goodFeaturesToTrack`. Tím se v obraze
-najdou nové výrazné body, které se přidají do seznamu tracks.
+Every third frame (`frame_idx % detect_interval == 0`) the `cv.goodFeaturesToTrack` function is called. This will find new prominent points in the image
+and add them to the tracks list.
 
 ### Dense
 
-Funkce `cv.calcOpticalFlowFarneback` počítá vektory pohybu pro celý obraz v každém snímku. Následně se aplikuje
-prahování (`cv.threshold`) na velikost vektorů.
+The `cv.calcOpticalFlowFarneback` function calculates the motion vectors for the entire image in each frame. Then, a threshold (`cv.threshold`) is applied to the size of the vectors.
 
-## Řešení duplicit
+## Duplicate resolution
 
 ### Sparse
 
-Před zavoláním detektoru nových bodů se vytvoří maska, kde jsou pozice aktuálně sledovaných bodů začerněny (
-`hodnota 0`). Funkce `cv.goodFeaturesToTrack` hledá body pouze v bílých oblastech masky. Tím je matematicky zaručeno, že
-se nezačne sledovat bod, který už systém eviduje.
+Before calling the new point detector, a mask is created where the positions of the currently tracked points are blackened (
+`value 0`). The `cv.goodFeaturesToTrack` function searches for points only in the white areas of the mask. This mathematically guarantees that
+you will not start tracking a point that the system already registers.
 
 ```jupyter
 mask = np.zeros_like(frame_gray)
 mask[:] = 255
 for tr in tracks:
-    x, y = tr[-1]
-    cv.circle(mask, (int(x), int(y)), 5, 0, -1)
+x, y = tr[-1]
+cv.circle(mask, (int(x), int(y)), 5, 0, -1)
 ```
 
 ### Dense
 
-Dense optical flow může být zašuměný a jeden objekt může vypadat jako mnoho malých skvrn, tj. jeden objekt by byl
-zaregostrován vícekrát. Morfologická operace close spojí tyto blízké body do jednoho celistvého blobu, čímž zamezí
-vícenásobné detekci jednoho auta.
+Dense optical flow can be noisy and one object can look like many small spots, i.e. one object would be
+registered multiple times. The morphological operation close will merge these nearby points into one solid blob, thus preventing
+multiple detection of one car.
 
 ```jupyter
 processed_mask = cv.morphologyEx(motion_mask, cv.MORPH_CLOSE, k, iterations=9)
 ```
 
-## Řešení kolizí
+## Collision Resolution
 
 ### Sparse
 
-Algoritmus spočítá pohyb bodu z času t do t+1 a hned poté zpětný pohyb z t+1 do t.
-Pokud je sledování správné, měl by se bod vrátit přesně na své původní místo. Pokud došlo ke kolizi nebo zákrytu, bod
-se "ztratí" nebo se přichytí na jiný objekt, a zpětný pohyb skončí jinde. Pokud je vzdálenost d větší než 1 pixel, bod
-je vyřazen jako nespolehlivý.
+The algorithm calculates the motion of a point from time t to t+1 and then the backward motion from t+1 to t.
+If the tracking is correct, the point should return exactly to its original location. If there is a collision or occlusion, the point
+is "lost" or gets stuck on another object, and the backward motion ends somewhere else. If the distance d is greater than 1 pixel, the point
+is discarded as unreliable.
 
 ```jupyter
 p1, _, _ = cv.calcOpticalFlowPyrLK(img0, img1, p0, ...)
@@ -1047,6 +1032,5 @@ good = d < 1
 
 ### Dense
 
-Neřeší se zde identita objektů, pouze dektekce pohybu. Při kolizi se jejich pohybové masky spojí do jedné velké kontury.
-Na rozdíl od sparse metody zde není mechanismus, který by poznal, že se "ztratil" konkrétní bod. Objekt je prostě po
-dobu kolize vnímán jako jeden velký pohybující se shluk.
+The identity of the objects is not addressed here, only the detection of motion. In case of collision, their motion masks are merged into one large contour.
+Unlike the sparse method, there is no mechanism that would recognize that a specific point has been "lost". The object is simply perceived as one large moving cluster after the collision.
